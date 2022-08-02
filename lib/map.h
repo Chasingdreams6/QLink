@@ -15,5 +15,11 @@ enum Map {
     ITEM6,
 };
 
+enum Direction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+};
 
 #endif // MAP_H

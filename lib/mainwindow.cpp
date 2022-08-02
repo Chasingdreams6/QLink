@@ -1,10 +1,11 @@
 #include "mainwindow.h"
 #include "map.h"
 #include "QPainter"
+#include "user.h"
 
 
 int map[LINE][COLUMN];
-
+User user1, user2;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     resize(SCREEN_WIDTH, SCREEN_HEIGHT);
     setWindowIconText(QString("QLink"));
     generateMap(6);
+    connect(this, SIGNAL(change()), this, SLOT(update()));
 }
 
 MainWindow::~MainWindow()
@@ -29,6 +31,8 @@ void MainWindow::paintEvent(QPaintEvent *event)
             switch (map[i][j]) {
             case USER1: {
                 painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(USER1_PATH));
+                user1.x = i;
+                user1.y = j;
                 break;
             }
             case ITEM1: {
@@ -60,6 +64,67 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 }
 
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Up)
+        user1Move(UP);
+    if (event->key() == Qt::Key_Left)
+        user1Move(LEFT);
+    if (event->key() == Qt::Key_Right)
+        user1Move(RIGHT);
+    if (event->key() == Qt::Key_Down)
+        user1Move(DOWN);
+}
+
+void MainWindow::user1Move(enum Direction direction)
+{
+    switch (direction) {
+    case UP: {
+        int nxtx, curx = user1.x, cury = user1.y;
+        if (!curx) nxtx = LINE - 1;
+        else nxtx = curx - 1;
+        if (map[nxtx][cury] == EMPTY) {
+            map[nxtx][cury] = USER1;
+            map[curx][cury] = EMPTY;
+        }
+
+        break;
+    }
+    case DOWN: {
+        int nxtx, curx = user1.x, cury = user1.y;
+        if (curx == LINE - 1) nxtx = 0;
+        else nxtx = curx + 1;
+        if (map[nxtx][cury] == EMPTY) {
+            map[nxtx][cury] = USER1;
+            map[curx][cury] = EMPTY;
+        }
+
+        break;
+    }
+    case LEFT: {
+        int nxty, curx = user1.x, cury = user1.y;
+        if (!cury) nxty = COLUMN - 1;
+        else nxty = cury - 1;
+        if (map[curx][nxty] == EMPTY) {
+            map[curx][nxty] = USER1;
+            map[curx][cury] = EMPTY;
+        }
+
+        break;
+    }
+    case RIGHT: {
+        int nxty, curx = user1.x, cury = user1.y;
+        if (cury == COLUMN - 1) nxty = 0;
+        else nxty = cury + 1;
+        if (map[curx][nxty] == EMPTY) {
+            map[curx][nxty] = USER1;
+            map[curx][cury] = EMPTY;
+        }
+        break;
+    }
+    }
+    emit change();
+}
 
 // level 表示最大出现的方块种类数
 void MainWindow::generateMap(int level)

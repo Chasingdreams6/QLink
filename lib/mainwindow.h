@@ -3,7 +3,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include "QKeyEvent"
+#include "map.h"
 
 #define SCREEN_WIDTH 960 // 屏幕宽度
 #define SCREEN_HEIGHT 768 // 屏幕高度
@@ -35,8 +36,11 @@ private:
     void generateMap(int level);
     void generatePeople();
     void generateBlocks(int level);
+    void user1Move(enum Direction);
 protected:
     void paintEvent(QPaintEvent *event);
-    //void keyPressEvent(QKeyEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+signals:
+    void change();
 };
 #endif // MAINWINDOW_H
