@@ -114,12 +114,18 @@ debug/qrc_images.cpp: ../lib/images.qrc \
 		../../../../Qt/5.14.2/mingw73_64/bin/rcc.exe \
 		../lib/images/item1.jpeg \
 		../lib/images/item4.jpeg \
+		../lib/images/item1_selected.jpeg \
+		../lib/images/item2_selected.jpeg \
 		../lib/images/item3.jpeg \
+		../lib/images/item3_selected.jpeg \
 		../lib/images/blackground.bmp \
 		../lib/images/item6.jpeg \
+		../lib/images/item4_selected.jpeg \
 		../lib/images/item2.jpeg \
+		../lib/images/item5_selected.jpeg \
 		../lib/images/item5.jpeg \
-		../lib/images/user1.jpeg
+		../lib/images/user1.jpeg \
+		../lib/images/item6_selected.jpeg
 	E:\Qt\5.14.2\mingw73_64\bin\rcc.exe -name images ..\lib\images.qrc -o debug\qrc_images.cpp
 
 compiler_moc_predefs_make_all: debug/moc_predefs.h

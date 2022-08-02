@@ -9,5 +9,11 @@
         <file>images/item5.jpeg</file>
         <file>images/item6.jpeg</file>
         <file>images/user1.jpeg</file>
+        <file>images/item1_selected.jpeg</file>
+        <file>images/item2_selected.jpeg</file>
+        <file>images/item3_selected.jpeg</file>
+        <file>images/item4_selected.jpeg</file>
+        <file>images/item5_selected.jpeg</file>
+        <file>images/item6_selected.jpeg</file>
     </qresource>
 </RCC>

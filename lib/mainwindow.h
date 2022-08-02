@@ -23,6 +23,12 @@
 #define ITEM5_PATH ":/images/item5.jpeg"
 #define ITEM6_PATH ":/images/item6.jpeg"
 #define USER1_PATH ":/images/user1.jpeg"
+#define ITEM1_SELECTED ":/images/item1_selected.jpeg"
+#define ITEM2_SELECTED ":/images/item2_selected.jpeg"
+#define ITEM3_SELECTED ":/images/item3_selected.jpeg"
+#define ITEM4_SELECTED ":/images/item4_selected.jpeg"
+#define ITEM5_SELECTED ":/images/item5_selected.jpeg"
+#define ITEM6_SELECTED ":/images/item6_selected.jpeg"
 
 class MainWindow : public QMainWindow
 {

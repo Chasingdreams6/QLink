@@ -5,6 +5,7 @@
 
 
 int map[LINE][COLUMN];
+int selected[LINE][COLUMN];
 User user1, user2;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -36,27 +37,45 @@ void MainWindow::paintEvent(QPaintEvent *event)
                 break;
             }
             case ITEM1: {
-                painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM1_PATH));
+                if (!selected[i][j])
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM1_PATH));
+                else
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM1_SELECTED));
                 break;
             }
             case ITEM2: {
-                painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM2_PATH));
+                if (!selected[i][j])
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM2_PATH));
+                else
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM2_SELECTED));
                 break;
             }
             case ITEM3: {
-                painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM3_PATH));
+                if (!selected[i][j])
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM3_PATH));
+                else
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM3_SELECTED));
                 break;
             }
             case ITEM4: {
-                painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM4_PATH));
+                if (!selected[i][j])
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM4_PATH));
+                else
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM4_SELECTED));
                 break;
             }
             case ITEM5: {
-                painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM5_PATH));
+                if (!selected[i][j])
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM5_PATH));
+                else
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM5_SELECTED));
                 break;
             }
             case ITEM6: {
-                painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM6_PATH));
+                if (!selected[i][j])
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM6_PATH));
+                else
+                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM6_SELECTED));
                 break;
             }
             }
@@ -87,7 +106,9 @@ void MainWindow::user1Move(enum Direction direction)
             map[nxtx][cury] = USER1;
             map[curx][cury] = EMPTY;
         }
-
+        if (map[nxtx][cury] >= ITEM1 && map[nxtx][cury] <= ITEM6) {
+            selected[nxtx][cury] = 1 - selected[nxtx][cury];
+        }
         break;
     }
     case DOWN: {
@@ -98,7 +119,9 @@ void MainWindow::user1Move(enum Direction direction)
             map[nxtx][cury] = USER1;
             map[curx][cury] = EMPTY;
         }
-
+        if (map[nxtx][cury] >= ITEM1 && map[nxtx][cury] <= ITEM6) {
+            selected[nxtx][cury] = 1 - selected[nxtx][cury];
+        }
         break;
     }
     case LEFT: {
@@ -109,7 +132,9 @@ void MainWindow::user1Move(enum Direction direction)
             map[curx][nxty] = USER1;
             map[curx][cury] = EMPTY;
         }
-
+        if (map[curx][nxty] >= ITEM1 && map[curx][nxty] <= ITEM6) {
+            selected[curx][nxty] = 1 - selected[curx][nxty];
+        }
         break;
     }
     case RIGHT: {
@@ -119,6 +144,9 @@ void MainWindow::user1Move(enum Direction direction)
         if (map[curx][nxty] == EMPTY) {
             map[curx][nxty] = USER1;
             map[curx][cury] = EMPTY;
+        }
+        if (map[curx][nxty] >= ITEM1 && map[curx][nxty] <= ITEM6) {
+            selected[curx][nxty] = 1 - selected[curx][nxty];
         }
         break;
     }
@@ -134,6 +162,7 @@ void MainWindow::generateMap(int level)
     for (int i = 0; i < LINE; ++i) {
         for (int j = 0; j < COLUMN; ++j) {
             map[i][j] = EMPTY;
+            selected[i][j] = 0;
         }
     }
 
