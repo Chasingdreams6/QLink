@@ -22,4 +22,17 @@ enum Direction {
     RIGHT,
 };
 
+
+enum LastMove {
+    X,
+    Y,
+    ALLTYPE,
+};
+
+
+
+struct Poi {
+    int x, y;
+};
+
 #endif // MAP_H

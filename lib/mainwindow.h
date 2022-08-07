@@ -43,6 +43,10 @@ private:
     void generatePeople();
     void generateBlocks(int level);
     void user1Move(enum Direction);
+    void tryMatch(int curx, int cury);
+    bool dfs(int curx, int cury, int countTurns, enum LastMove);
+    void drawLine();
+    bool differ(int x1, int y1, int x2, int y2);
 protected:
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
