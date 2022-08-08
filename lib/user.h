@@ -2,7 +2,10 @@
 #define USER_H
 
 struct User {
-    int x, y;
+    int x, y, pts;
+    User() {
+        pts = 0;
+    }
 };
 
 

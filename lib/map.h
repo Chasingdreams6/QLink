@@ -33,6 +33,11 @@ enum LastMove {
 
 struct Poi {
     int x, y;
+    Poi(int xx, int yy) {
+        x = xx;
+        y = yy;
+    }
+    Poi(){}
 };
 
 #endif // MAP_H

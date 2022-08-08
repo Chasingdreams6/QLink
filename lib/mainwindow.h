@@ -7,13 +7,14 @@
 #include "map.h"
 
 #define SCREEN_WIDTH 960 // 屏幕宽度
-#define SCREEN_HEIGHT 768 // 屏幕高度
+#define SCREEN_HEIGHT 880 // 屏幕高度
 #define LINE 13 // 地图行数
 #define COLUMN 16 // 地图列数
 #define SIZE 60
-#define X_SHIFT 0
-#define Y_SHIFT 0
+#define X_SHIFT 0 // 左右偏移
+#define Y_SHIFT 112 // 上下偏移
 #define SHUFFLE_RATIO 50
+#define INIT_TIME 180
 
 #define BACKGROUND_PATH ":/images/blackground.bmp"
 #define ITEM1_PATH ":/images/item1.jpeg"
@@ -37,7 +38,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+public slots:
+    void updateTime();
 private:
     void generateMap(int level);
     void generatePeople();
@@ -47,10 +49,14 @@ private:
     bool dfs(int curx, int cury, int countTurns, enum LastMove);
     void drawLine();
     bool differ(int x1, int y1, int x2, int y2);
+    bool isSurrounded(int x1, int y1);
+    bool isObjects(int x1, int y1);
+    bool haveSolution();
+
 protected:
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
 signals:
-    void change();
+    void change(); 
 };
 #endif // MAINWINDOW_H
