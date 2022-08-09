@@ -121,8 +121,10 @@ release/qrc_images.cpp: ../lib/images.qrc \
 		../lib/images/blackground.bmp \
 		../lib/images/item6.jpeg \
 		../lib/images/item4_selected.jpeg \
+		../lib/images/add1.png \
 		../lib/images/item2.jpeg \
 		../lib/images/item5_selected.jpeg \
+		../lib/images/shuffle.png \
 		../lib/images/item5.jpeg \
 		../lib/images/user1.jpeg \
 		../lib/images/item6_selected.jpeg
@@ -507,7 +509,11 @@ release/mainwindow.o: ../lib/mainwindow.cpp ../lib/mainwindow.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qpainter.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qtextoption.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qpen.h \
-		../lib/user.h
+		../lib/user.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/QDebug \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/QTimer \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qtimer.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qbasictimer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\mainwindow.o ..\lib\mainwindow.cpp
 
 release/map.o: ../lib/map.cpp ../lib/map.h

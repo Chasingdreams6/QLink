@@ -37,9 +37,44 @@ MainWindow::~MainWindow()
 
 }
 
+void MainWindow::generateProp(enum Map item)
+{
+    int x = rand() % LINE, y = rand() % COLUMN;
+    int curCnt = 0;
+    while (map[x][y] != EMPTY) {
+        x = rand() % LINE;
+        y = rand() % COLUMN;
+        curCnt++;
+        if (curCnt > RANDOM_LIM) return;
+    }
+    map[x][y] = item;
+}
+void MainWindow::generateOutSpace(enum Map item)
+{
+    int xPool[] = {0, 1, LINE - 2, LINE - 1};
+    int yPool[] = {0, 1, COLUMN - 2, COLUMN - 1};
+    int x = rand() % 4, y = rand() % 4;
+    int curCnt = 0;
+    while (map[xPool[x]][yPool[y]] != EMPTY) {
+        x = rand() % 4;
+        y = rand() % 4;
+        curCnt++;
+        if (curCnt > RANDOM_LIM) return ;
+    }
+    map[xPool[x]][yPool[y]] = item;
+}
 void MainWindow::updateTime()
 {
    lastT--;
+
+   // 依照概率生成一些方块
+   const int MO = 1000;
+   int rand1 = rand() % MO;
+   if  (rand1 < ADD_RATIO * MO) generateProp(ADD1);
+
+   rand1 = rand() % MO;
+   if (rand1 < SHUFFLE_RATIO * MO) generateOutSpace(SHUFFLE);
+
    emit change();
 }
 
@@ -50,56 +85,54 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     for (int i = 0; i < LINE; ++i) {
         for (int j = 0; j < COLUMN; ++j) {
+            QPixmap graph;
             switch (map[i][j]) {
             case USER1: {
-                painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(USER1_PATH));
+                graph = QPixmap(USER1_PATH);
                 user1.x = i;
                 user1.y = j;
                 break;
             }
             case ITEM1: {
-                if (!selected[i][j])
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM1_PATH));
-                else
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM1_SELECTED));
+                if (!selected[i][j]) graph = QPixmap(ITEM1_PATH);
+                else graph = QPixmap(ITEM1_SELECTED);
                 break;
             }
             case ITEM2: {
-                if (!selected[i][j])
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM2_PATH));
-                else
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM2_SELECTED));
+                if (!selected[i][j]) graph = QPixmap(ITEM2_PATH);
+                else graph = QPixmap(ITEM2_SELECTED);
                 break;
             }
             case ITEM3: {
-                if (!selected[i][j])
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM3_PATH));
-                else
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM3_SELECTED));
+                if (!selected[i][j]) graph = QPixmap(ITEM3_PATH);
+                else graph = QPixmap(ITEM3_SELECTED);
                 break;
             }
             case ITEM4: {
-                if (!selected[i][j])
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM4_PATH));
-                else
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM4_SELECTED));
+                if (!selected[i][j]) graph = QPixmap(ITEM4_PATH);
+                else graph = QPixmap(ITEM4_SELECTED);
                 break;
             }
             case ITEM5: {
-                if (!selected[i][j])
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM5_PATH));
-                else
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM5_SELECTED));
+                if (!selected[i][j]) graph = QPixmap(ITEM5_PATH);
+                else graph = QPixmap(ITEM5_SELECTED);
                 break;
             }
             case ITEM6: {
-                if (!selected[i][j])
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM6_PATH));
-                else
-                    painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, QPixmap(ITEM6_SELECTED));
+                if (!selected[i][j]) graph = QPixmap(ITEM6_PATH);
+                else graph = QPixmap(ITEM6_SELECTED);
+                break;
+            }
+            case ADD1: {
+                graph = QPixmap(ADD1_PATH);
+                break;
+            }
+            case SHUFFLE: {
+                graph = QPixmap(SHUFFLE_PATH);
                 break;
             }
             }
+            painter.drawPixmap(X_SHIFT + SIZE * j, Y_SHIFT + SIZE * i, SIZE, SIZE, graph);
         }
     }
 
@@ -188,11 +221,11 @@ void MainWindow::user1Move(enum Direction direction)
     if (nxtx == LINE) nxtx = 0;
     if (nxty < 0) nxty = COLUMN - 1;
     if (nxty == COLUMN) nxty = 0;
-    if (map[nxtx][nxty] == EMPTY) {
+    if (map[nxtx][nxty] == EMPTY) { // 移动
         map[nxtx][nxty] = USER1;
         map[curx][cury] = EMPTY;
     }
-    if (map[nxtx][nxty] >= ITEM1 && map[nxtx][nxty] <= ITEM6) {
+    if (map[nxtx][nxty] >= ITEM1 && map[nxtx][nxty] <= ITEM6) { // 选中方块
         if (lastx == -1) {
             selected[nxtx][nxty] = 1 - selected[nxtx][nxty];
             lastx = nxtx;
@@ -200,9 +233,30 @@ void MainWindow::user1Move(enum Direction direction)
         }
         else tryMatch(nxtx, nxty);
     }
+    if (map[nxtx][nxty] == ADD1) { // 触发+1s道具
+        lastT += ADD_TIME;
+        map[nxtx][nxty] = USER1;
+        map[curx][cury] = EMPTY;
+    }
+    if (map[nxtx][nxty] == SHUFFLE) { // 触发重排道具
+        map[nxtx][nxty] =  EMPTY;
+        shuffle();
+    }
     emit change();
 }
 
+void MainWindow::shuffle() // 重排
+{
+    if (lastx != -1) {
+        selected[lastx][lasty] = 1 - selected[lastx][lasty];
+        lastx = lasty = -1;
+    }
+    for (int i = 0; i < SHUFFLE_CNT; ++i) {
+        int x1 = rand() % (LINE - 4) + 2, y1 = rand() % (COLUMN - 4) + 2;
+        int x2 = rand() % (LINE - 4) + 2, y2 = rand() % (COLUMN - 4) + 2;
+        std::swap(map[x1][y1], map[x2][y2]);
+    }
+}
 bool MainWindow::differ(int x1, int y1, int x2, int y2)
 {
     return (x1 != x2 || y1 != y2);
@@ -303,7 +357,7 @@ void MainWindow::generateBlocks(int level)
             tmp++;
         }
     }
-    for (int i = 0; i < SHUFFLE_RATIO; ++i) {
+    for (int i = 0; i < SHUFFLE_CNT; ++i) {
         int x1 = rand() % (LINE - 4), y1 = rand() % (COLUMN - 4);
         int x2 = rand() % (LINE - 4), y2 = rand() % (COLUMN - 4);
         std::swap(map[x1 + 2][y1 + 2], map[x2 + 2][y2 + 2]);

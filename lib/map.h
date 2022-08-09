@@ -13,6 +13,8 @@ enum Map {
     ITEM4,
     ITEM5,
     ITEM6,
+    ADD1,
+    SHUFFLE,
 };
 
 enum Direction {

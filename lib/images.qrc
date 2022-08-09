@@ -15,5 +15,7 @@
         <file>images/item4_selected.jpeg</file>
         <file>images/item5_selected.jpeg</file>
         <file>images/item6_selected.jpeg</file>
+        <file>images/add1.png</file>
+        <file>images/shuffle.png</file>
     </qresource>
 </RCC>
