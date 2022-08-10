@@ -39,3 +39,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     images.qrc
+
+DISTFILES += \
+    images/item1_hinted.jpeg \
+    images/item2_hinted.jpeg \
+    images/item3_hinted.jpeg \
+    images/item4_hinted.jpeg \
+    images/item5_hinted.jpeg \
+    images/item6_hinted.jpeg

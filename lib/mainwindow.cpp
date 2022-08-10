@@ -5,6 +5,7 @@
 #include "QDebug"
 #include "QTimer"
 #include <vector>
+#include <queue>
 
 int moveX[] = {-1, 1, 0, 0}; // 上下左右 对应的数组下标变化
 int moveY[] = {0, 0, -1, 1};
@@ -18,6 +19,8 @@ int cntPath, reachFlag;
 Poi path[LINE * COLUMN];
 int lastx = -1, lasty = -1;
 int lastT = INIT_TIME;
+Poi hint1 = Poi(-1, -1), hint2 = Poi(-1, -1);
+int hintTime = 0;
 User user1, user2;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -66,7 +69,21 @@ void MainWindow::generateOutSpace(enum Map item)
 void MainWindow::updateTime()
 {
    lastT--;
-
+   if (hintTime > 0) { // 生成两个提示方块
+        hintTime--;
+        if (!isLegalObject(hint1.x, hint1.y)
+                || !isLegalObject(hint2.x, hint2.y)
+                || !tryMatch(hint1.x, hint1.y, hint2.x, hint2.y, 0))  {
+            hint1 = Poi(-1, -1);
+            hint2 = Poi(-1, -1);
+            haveSolution(1);
+        }
+   }
+   else {
+       hint1 = Poi(-1, -1);
+       hint2 = Poi(-1, -1);
+   }
+   qDebug() << "t:" << lastT << " hint: " << hint1.x << " " << hint1.y << " " << hint2.x << " " <<hint2.y << endl;
    // 依照概率生成一些方块
    const int MO = 1000;
    int rand1 = rand() % MO;
@@ -75,9 +92,17 @@ void MainWindow::updateTime()
    rand1 = rand() % MO;
    if (rand1 < SHUFFLE_RATIO * MO) generateOutSpace(SHUFFLE);
 
+   rand1 = rand() % MO;
+   if (rand1 < HINT_RATIO * MO) generateProp(HINT);
    emit change();
 }
-
+bool MainWindow::isHinted(int x1, int y1) // 判断一个方块是不是高亮方块
+{
+    if (!isLegalObject(x1, y1)) return false;
+    if (hint1.x == x1 && hint1.y == y1) return true;
+    if (hint2.x == x1 && hint2.y == y1) return true;
+    return false;
+}
 void MainWindow::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
@@ -94,32 +119,50 @@ void MainWindow::paintEvent(QPaintEvent *event)
                 break;
             }
             case ITEM1: {
-                if (!selected[i][j]) graph = QPixmap(ITEM1_PATH);
+                if (!selected[i][j]) {
+                    if (isHinted(i, j)) graph = QPixmap(ITEM1_HINTED);
+                    else graph = QPixmap(ITEM1_PATH);
+                }
                 else graph = QPixmap(ITEM1_SELECTED);
                 break;
             }
             case ITEM2: {
-                if (!selected[i][j]) graph = QPixmap(ITEM2_PATH);
+                if (!selected[i][j]) {
+                    if (isHinted(i, j)) graph = QPixmap(ITEM2_HINTED);
+                    else graph = QPixmap(ITEM2_PATH);
+                }
                 else graph = QPixmap(ITEM2_SELECTED);
                 break;
             }
             case ITEM3: {
-                if (!selected[i][j]) graph = QPixmap(ITEM3_PATH);
+                if (!selected[i][j]) {
+                    if (isHinted(i, j)) graph = QPixmap(ITEM3_HINTED);
+                    else graph = QPixmap(ITEM3_PATH);
+                }
                 else graph = QPixmap(ITEM3_SELECTED);
                 break;
             }
             case ITEM4: {
-                if (!selected[i][j]) graph = QPixmap(ITEM4_PATH);
+                if (!selected[i][j]) {
+                    if (isHinted(i, j)) graph = QPixmap(ITEM4_HINTED);
+                    else graph = QPixmap(ITEM4_PATH);
+                }
                 else graph = QPixmap(ITEM4_SELECTED);
                 break;
             }
             case ITEM5: {
-                if (!selected[i][j]) graph = QPixmap(ITEM5_PATH);
+                if (!selected[i][j]) {
+                    if (isHinted(i, j)) graph = QPixmap(ITEM5_HINTED);
+                    else graph = QPixmap(ITEM5_PATH);
+                }
                 else graph = QPixmap(ITEM5_SELECTED);
                 break;
             }
             case ITEM6: {
-                if (!selected[i][j]) graph = QPixmap(ITEM6_PATH);
+                if (!selected[i][j]) {
+                    if (isHinted(i, j)) graph = QPixmap(ITEM6_HINTED);
+                    else graph = QPixmap(ITEM6_PATH);
+                }
                 else graph = QPixmap(ITEM6_SELECTED);
                 break;
             }
@@ -129,6 +172,10 @@ void MainWindow::paintEvent(QPaintEvent *event)
             }
             case SHUFFLE: {
                 graph = QPixmap(SHUFFLE_PATH);
+                break;
+            }
+            case HINT: {
+                graph = QPixmap(HINT_PATH);
                 break;
             }
             }
@@ -141,7 +188,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
     painter.save();
     painter.setPen(QPen(Qt::yellow, 5));
     for (int i = 1; i < cntPath; ++i) {
-        qDebug() << X_SHIFT + SIZE * path[i].x + SIZE / 2 << endl;
+        //qDebug() << X_SHIFT + SIZE * path[i].x + SIZE / 2 << endl;
         painter.drawLine(X_SHIFT + SIZE * path[i].y + SIZE / 2,
                          Y_SHIFT + SIZE * path[i].x + SIZE / 2,
                          X_SHIFT + SIZE * path[i + 1].y + SIZE / 2,
@@ -175,7 +222,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         user1Move(DOWN);
 }
 
-bool MainWindow::isObjects(int x1, int y1)
+bool MainWindow::isObjects(const int &x1, const int &y1)
 {
     return (map[x1][y1] >= ITEM1 && map[x1][y1] <= ITEM6);
 }
@@ -189,26 +236,67 @@ bool MainWindow::isSurrounded(int x1, int y1)
     if (y1 > 0) res &= isObjects(x1, y1 - 1);
     return res;
 }
-bool MainWindow::haveSolution()
+
+// 判断一个方块是否可达
+bool MainWindow::isOutside(int x1, int y1)
+{
+    int vis[LINE][COLUMN];
+    for (int i = 0; i < LINE; ++i)
+        for (int j = 0; j < LINE; ++j)
+            vis[i][j] = 0;
+    std::queue<Poi> que;
+    que.push(Poi(x1, y1));
+    while (!que.empty()) {
+        int curx = que.front().x, cury = que.front().y;
+        que.pop();
+        vis[curx][cury] = 1;
+        if (curx < 2 || curx > LINE - 2 || cury < 2 || cury > COLUMN - 2) {
+            return true;
+        }
+        for (int i = 0; i < 4; ++i) {
+            int nxtx = curx + moveX[i], nxty = cury + moveY[i];
+            if (nxtx >= LINE || nxtx < 0 || nxty >= COLUMN || nxty < 0) continue;
+            if (isObjects(nxtx, nxty)) continue;
+            if (vis[nxtx][nxty]) continue;
+            que.push(Poi(nxtx, nxty));
+        }
+    }
+    return false;
+}
+// opt = 0, 只判断有没有解
+// opt = 1， hint道具调用，需要高亮出解
+bool MainWindow::haveSolution(int opt)
 {
     std::vector<Poi> pool[6];
     for (int i = 0; i < LINE; ++i) {
         for (int j = 0; j < COLUMN; ++j) {
-            if (isObjects(i, j) && !isSurrounded(i, j)) {
+            if (isObjects(i, j) && isOutside(i, j)) {
                 pool[map[i][j] - ITEM1].push_back(Poi(i, j));
             }
         }
     }
+    int cc = 0;
     for (int i = 0; i < 6; ++i) {
         int size = pool[i].size();
         for (int j = 0; j < size; ++j) {
             for (int k = j + 1; k < size; ++k) {
-                lastx = pool[i][j].x;
-                lasty = pool[i][j].y;
-                if (dfs(pool[i][k].x, pool[i][k].y, 0, ALLTYPE)) return true;
+                cc++;
+                //qDebug() << "try" << pool[i][j].x << " "
+                        // << pool[i][j].y << " " << pool[i][k].x << " " << pool[i][k].y << endl;
+                if (tryMatch(pool[i][j].x, pool[i][j].y, pool[i][k].x, pool[i][k].y, 0)) {
+
+                    qDebug() << "cntok:" << cc << endl;
+                    if (opt == 1) {
+                       hint1 = Poi(pool[i][j].x, pool[i][j].y);
+                       hint2 = Poi(pool[i][k].x, pool[i][k].y);
+                       //qDebug() << "find" << endl;
+                    }
+                    return true;
+                }
             }
         }
     }
+    qDebug() << "cntnotok:" << cc << endl;
     return false;
 }
 void MainWindow::user1Move(enum Direction direction)
@@ -227,11 +315,15 @@ void MainWindow::user1Move(enum Direction direction)
     }
     if (map[nxtx][nxty] >= ITEM1 && map[nxtx][nxty] <= ITEM6) { // 选中方块
         if (lastx == -1) {
-            selected[nxtx][nxty] = 1 - selected[nxtx][nxty];
+            selected[nxtx][nxty] = 1;
             lastx = nxtx;
             lasty = nxty;
         }
-        else tryMatch(nxtx, nxty);
+        else {
+            tryMatch(nxtx, nxty, lastx, lasty, 1);
+            selected[lastx][lasty] = 0;
+            lastx = lasty = -1;
+        }
     }
     if (map[nxtx][nxty] == ADD1) { // 触发+1s道具
         lastT += ADD_TIME;
@@ -239,8 +331,14 @@ void MainWindow::user1Move(enum Direction direction)
         map[curx][cury] = EMPTY;
     }
     if (map[nxtx][nxty] == SHUFFLE) { // 触发重排道具
-        map[nxtx][nxty] =  EMPTY;
+        map[nxtx][nxty] = USER1;
+        map[curx][cury] = EMPTY;
         shuffle();
+    }
+    if (map[nxtx][nxty] == HINT) { // 触发提示道具
+        map[nxtx][nxty] = USER1;
+        map[curx][cury] = EMPTY;
+        hintTime += HINT_TIME;
     }
     emit change();
 }
@@ -261,9 +359,19 @@ bool MainWindow::differ(int x1, int y1, int x2, int y2)
 {
     return (x1 != x2 || y1 != y2);
 }
-// 尝试进行(curx, cury)方块与(lastx, lasty)方块的匹配
-void MainWindow::tryMatch(int curx, int cury)
+// 判断(x1, y1)是不是合法的方块
+bool MainWindow::isLegalObject(int x1, int y1)
 {
+    if (x1 < 2 || x1 > LINE - 2)return false;
+    if (y1 < 2 || y1 > COLUMN - 2) return false;
+    if (map[x1][y1] < ITEM1 || map[x1][y1] > ITEM6) return false;
+    return true;
+}
+// 尝试进行(curx, cury)方块与(lastx, lasty)方块的匹配
+// opt = 0, 不消除; opt = 1，消除
+bool MainWindow::tryMatch(int curx, int cury, int lastx, int lasty, int opt)
+{
+    bool res = false;
     reachFlag = 0;
     cntPath = 0;
     for (int i = 0; i < LINE; ++i)
@@ -272,20 +380,25 @@ void MainWindow::tryMatch(int curx, int cury)
 
     if (differ(curx, cury, lastx, lasty) &&
         map[curx][cury] == map[lastx][lasty] &&
-        dfs(curx, cury, 0, ALLTYPE)) { // 成功在两个转弯之内匹配
-            user1.pts += points[map[curx][cury] - ITEM1];
-            map[curx][cury] = EMPTY;
-            map[lastx][lasty] = EMPTY;
+        dfs(curx, cury, lastx, lasty, 0, ALLTYPE, opt)) { // 成功在两个转弯之内匹配
+            if (opt == 1) {
+                user1.pts += points[map[curx][cury] - ITEM1];
+                map[curx][cury] = EMPTY;
+                map[lastx][lasty] = EMPTY;
+            }
+            res = true;
     }
-    selected[lastx][lasty] = 0;
-    lastx = lasty = -1;
+    return res;
 }
-
-bool MainWindow::dfs(int curx, int cury, int countTurns, enum LastMove lastMove)
+// 判断(curx, cury)能否在两个转弯之内到(lastx, lasty)
+// opt = 0, 不记录路径； opt = 1，记录路径
+bool MainWindow::dfs(int curx, int cury, int lastx, int lasty, int countTurns, enum LastMove lastMove, int opt)
 {
     if (countTurns > 2 || reachFlag) return false;
-    path[++cntPath].x = curx;
-    path[cntPath].y = cury;
+    if (opt) {
+        path[++cntPath].x = curx;
+        path[cntPath].y = cury;
+    }
     visited[curx][cury] = 1;
     //qDebug() << "(" << curx << "," << cury << ")" << "cntP" << cntPath << endl;
     if (curx == lastx && cury == lasty) { // reach
@@ -302,17 +415,17 @@ bool MainWindow::dfs(int curx, int cury, int countTurns, enum LastMove lastMove)
         if (map[nxtx][nxty] >= ITEM1 && map[nxtx][nxty] <= ITEM6 && (nxtx != lastx || nxty != lasty)) continue;
         if (nxtx != curx) { // movex
             if (lastMove == Y)
-                res |= dfs(nxtx, nxty, countTurns + 1, X);
-            else res |= dfs(nxtx, nxty, countTurns, X);
+                res |= dfs(nxtx, nxty, lastx, lasty, countTurns + 1, X, opt);
+            else res |= dfs(nxtx, nxty, lastx, lasty, countTurns, X, opt);
         }
         else { // movey
             if (lastMove == X)
-                res |= dfs(nxtx, nxty, countTurns + 1, Y);
-            else res |= dfs(nxtx, nxty, countTurns, Y);
+                res |= dfs(nxtx, nxty, lastx, lasty, countTurns + 1, Y, opt);
+            else res |= dfs(nxtx, nxty, lastx, lasty, countTurns, Y, opt);
         }
     }
     visited[curx][cury] = 0;
-    if (!res) cntPath--;
+    if (!res && opt) cntPath--;
     return res;
 }
 

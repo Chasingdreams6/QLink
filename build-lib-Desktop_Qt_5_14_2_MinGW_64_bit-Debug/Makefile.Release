@@ -62,7 +62,12 @@ OBJECTS       = release/main.o \
 		release/qrc_images.o \
 		release/moc_mainwindow.o
 
-DIST          =  ..\lib\mainwindow.h \
+DIST          = images/item1_hinted.jpeg \
+		images/item2_hinted.jpeg \
+		images/item3_hinted.jpeg \
+		images/item4_hinted.jpeg \
+		images/item5_hinted.jpeg \
+		images/item6_hinted.jpeg ..\lib\mainwindow.h \
 		..\lib\map.h \
 		..\lib\user.h ..\lib\main.cpp \
 		..\lib\mainwindow.cpp \
@@ -112,22 +117,29 @@ compiler_rcc_clean:
 	-$(DEL_FILE) release\qrc_images.cpp
 release/qrc_images.cpp: ../lib/images.qrc \
 		../../../../Qt/5.14.2/mingw73_64/bin/rcc.exe \
-		../lib/images/item1.jpeg \
 		../lib/images/item4.jpeg \
-		../lib/images/item1_selected.jpeg \
-		../lib/images/item2_selected.jpeg \
-		../lib/images/item3.jpeg \
 		../lib/images/item3_selected.jpeg \
-		../lib/images/blackground.bmp \
-		../lib/images/item6.jpeg \
-		../lib/images/item4_selected.jpeg \
 		../lib/images/add1.png \
-		../lib/images/item2.jpeg \
-		../lib/images/item5_selected.jpeg \
-		../lib/images/shuffle.png \
-		../lib/images/item5.jpeg \
+		../lib/images/blackground.bmp \
 		../lib/images/user1.jpeg \
-		../lib/images/item6_selected.jpeg
+		../lib/images/shuffle.png \
+		../lib/images/item3.jpeg \
+		../lib/images/item1_selected.jpeg \
+		../lib/images/item6_selected.jpeg \
+		../lib/images/item2.jpeg \
+		../lib/images/item1.jpeg \
+		../lib/images/item4_selected.jpeg \
+		../lib/images/hint.png \
+		../lib/images/item6.jpeg \
+		../lib/images/item2_selected.jpeg \
+		../lib/images/item5_selected.jpeg \
+		../lib/images/item5.jpeg \
+		../lib/images/item1_hinted.jpeg \
+		../lib/images/item2_hinted.jpeg \
+		../lib/images/item3_hinted.jpeg \
+		../lib/images/item4_hinted.jpeg \
+		../lib/images/item5_hinted.jpeg \
+		../lib/images/item6_hinted.jpeg
 	E:\Qt\5.14.2\mingw73_64\bin\rcc.exe -name images ..\lib\images.qrc -o release\qrc_images.cpp
 
 compiler_moc_predefs_make_all: release/moc_predefs.h

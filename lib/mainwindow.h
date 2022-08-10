@@ -15,9 +15,11 @@
 #define Y_SHIFT 112 // 上下偏移
 #define INIT_TIME 180   // 初始游戏时间
 #define ADD_TIME 10 // +1s道具的增加时长
-#define ADD_RATIO 0.1 // 每一秒的出现概率
-#define SHUFFLE_RATIO 0.1
+#define ADD_RATIO 0.05 // +1s道具每一秒的出现概率
+#define SHUFFLE_RATIO 0.05
+#define HINT_RATIO 0.05 // hint道具每秒的出现概率
 #define SHUFFLE_CNT 50 //  交换次数
+#define HINT_TIME 10 // 提示时间
 #define RANDOM_LIM 10
 
 #define BACKGROUND_PATH ":/images/blackground.bmp"
@@ -30,12 +32,19 @@
 #define USER1_PATH ":/images/user1.jpeg"
 #define ADD1_PATH ":/images/add1.png"
 #define SHUFFLE_PATH ":/images/shuffle.png"
+#define HINT_PATH ":/images/hint.png"
 #define ITEM1_SELECTED ":/images/item1_selected.jpeg"
 #define ITEM2_SELECTED ":/images/item2_selected.jpeg"
 #define ITEM3_SELECTED ":/images/item3_selected.jpeg"
 #define ITEM4_SELECTED ":/images/item4_selected.jpeg"
 #define ITEM5_SELECTED ":/images/item5_selected.jpeg"
 #define ITEM6_SELECTED ":/images/item6_selected.jpeg"
+#define ITEM1_HINTED ":/images/item1_hinted.jpeg"
+#define ITEM2_HINTED ":/images/item2_hinted.jpeg"
+#define ITEM3_HINTED ":/images/item3_hinted.jpeg"
+#define ITEM4_HINTED ":/images/item4_hinted.jpeg"
+#define ITEM5_HINTED ":/images/item5_hinted.jpeg"
+#define ITEM6_HINTED ":/images/item6_hinted.jpeg"
 
 class MainWindow : public QMainWindow
 {
@@ -53,15 +62,17 @@ private:
     void generateProp(enum Map);
     void generateOutSpace(enum Map);
     void user1Move(enum Direction);
-    void tryMatch(int curx, int cury);
-    bool dfs(int curx, int cury, int countTurns, enum LastMove);
+    bool tryMatch(int curx, int cury, int lastx, int lasty, int opt);
+    bool dfs(int curx, int cury, int lastx, int lasty, int countTurns, enum LastMove, int opt);
     void drawLine();
     bool differ(int x1, int y1, int x2, int y2);
     bool isSurrounded(int x1, int y1);
-    bool isObjects(int x1, int y1);
-    bool haveSolution();
+    bool isOutside(int x1, int y1);
+    bool isObjects(const int &x1, const int &y1);
+    bool haveSolution(int opt);
     void shuffle();
-
+    bool isHinted(int x1, int y1);
+    bool isLegalObject(int x1, int y1);
 protected:
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
