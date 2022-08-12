@@ -21,6 +21,7 @@ int lastx = -1, lasty = -1;
 int lastT = INIT_TIME;
 Poi hint1 = Poi(-1, -1), hint2 = Poi(-1, -1);
 int hintTime = 0;
+bool isActivated = true;
 User user1, user2;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -68,6 +69,8 @@ void MainWindow::generateOutSpace(enum Map item)
 }
 void MainWindow::updateTime()
 {
+   if (!isActivated) return ; // 如果是暂停状态 直接返回
+
    lastT--;
    if (hintTime > 0) { // 生成两个提示方块
         hintTime--;
@@ -220,6 +223,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         user1Move(RIGHT);
     if (event->key() == Qt::Key_Down)
         user1Move(DOWN);
+    if (event->key() == Qt::Key_P)
+        isActivated = !isActivated;
 }
 
 bool MainWindow::isObjects(const int &x1, const int &y1)
@@ -301,6 +306,7 @@ bool MainWindow::haveSolution(int opt)
 }
 void MainWindow::user1Move(enum Direction direction)
 {
+    if (!isActivated) return ; // 如果暂停状态，没有反应
     int curx = user1.x, cury = user1.y;
     int nxtx = curx + moveX[direction]; // 数组的顺序对应实际绘画的顺序, curx, cury是数组下标不是具体坐标
     int nxty = cury + moveY[direction];
