@@ -6,6 +6,14 @@
 #include "QTimer"
 #include <vector>
 #include <queue>
+#include "QHBoxLayout"
+#include "QVBoxLayout"
+#include "QMouseEvent"
+#include "QPushButton"
+#include "QLabel"
+#include "QFileDialog"
+#include "QFile"
+#include "QTime"
 
 int moveX[] = {-1, 1, 0, 0}; // 上下左右 对应的数组下标变化
 int moveY[] = {0, 0, -1, 1};
@@ -34,6 +42,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(change()), this, SLOT(update()));
     connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
     timer->start(1000);
+
+    pauseWidget = new PauseWidget;
+    connect(this, SIGNAL(pause()), pauseWidget, SLOT(showWindow()));
+    connect(pauseWidget, SIGNAL(unPause()), this, SLOT(unPause()));
+    connect(pauseWidget, SIGNAL(save()), this, SLOT(writeFile()));
+    connect(pauseWidget, SIGNAL(load()), this, SLOT(readFile()));
 }
 
 MainWindow::~MainWindow()
@@ -69,7 +83,10 @@ void MainWindow::generateOutSpace(enum Map item)
 }
 void MainWindow::updateTime()
 {
-   if (!isActivated) return ; // 如果是暂停状态 直接返回
+   if (!isActivated) {
+       emit change(); // 绘制暂停
+       return ;
+   }
 
    lastT--;
    if (hintTime > 0) { // 生成两个提示方块
@@ -211,6 +228,21 @@ void MainWindow::paintEvent(QPaintEvent *event)
     painter.drawText(rec2, 0, QString("玩家一得分：") + QString::number(user1.pts));
     const QRect rec3 = QRect(800, 0, 1000, 20);
     painter.drawText(rec3, 0, QString("玩家二得分：") + QString::number(user2.pts));
+
+//    // 绘制暂停页面
+//    if (!isActivated) {
+//        qDebug() << "show pause page" << endl;
+//        QVBoxLayout *vbox = new QVBoxLayout(this);
+//        QPushButton *saveButton = new QPushButton("保存", this);
+//        QPushButton *loadButton = new QPushButton("载入", this);
+//        QLabel *header = new QLabel("暂停", this);
+//        vbox->addWidget(header);
+//        vbox->addWidget(saveButton);
+//        vbox->addWidget(loadButton);
+//        QRect rec = QRect(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 60, 200);
+//        vbox->setGeometry(rec);
+//        //this->setLayout(vbox);
+//    }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -223,10 +255,19 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         user1Move(RIGHT);
     if (event->key() == Qt::Key_Down)
         user1Move(DOWN);
-    if (event->key() == Qt::Key_P)
+    if (event->key() == Qt::Key_P) {
+        if (isActivated) {
+            this->close();
+            emit pause();
+        }
         isActivated = !isActivated;
+    }
 }
-
+void MainWindow::unPause()
+{
+    isActivated = !isActivated;
+    this->show();
+}
 bool MainWindow::isObjects(const int &x1, const int &y1)
 {
     return (map[x1][y1] >= ITEM1 && map[x1][y1] <= ITEM6);
@@ -493,4 +534,67 @@ void MainWindow::generatePeople()
         y1 = ypos[rand() % 4];
     }
     map[y1][x1] = USER1;
+}
+
+// 存档
+void MainWindow::writeFile()
+{
+    uint time = QDateTime::currentDateTime().toTime_t();
+    QString path = QFileDialog::getSaveFileName(this, "保存",
+                                                "C:\\Users\\19026\\Desktop\\" + QString::number(time) + ".txt",
+                                                "TXT(*.txt)");
+    QFile file(path);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    for (int i = 0; i < LINE; ++i) {
+        for (int j = 0; j < COLUMN; ++j) {
+            out << map[i][j] << " ";
+        }
+        out << endl;
+    }
+    out << lastT << " " << hintTime << endl;
+    out << user1.x << " " << user1.y << " " << user1.pts << endl;
+    out << user2.x << " " << user2.y << " " << user2.pts << endl;
+    file.close();
+}
+void MainWindow::readFile()
+{
+    QString path = QFileDialog::getOpenFileName(this, "载入", "C:\\Users\\19026\\Desktop\\");
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return ;
+    while (!file.atEnd()) {
+        for (int i = 0; i < LINE; ++i) {
+            QByteArray array = file.readLine();
+            QString str = QString(array);
+            QStringList list = str.split(" ");
+            for (int j = 0; j < COLUMN; ++j) {
+                bool ok = false;
+                map[i][j] = list[j].toInt(&ok, 10);
+            }
+        }
+        QByteArray array = file.readLine();
+        QString str = QString(array);
+        QStringList list = str.split(" ");
+        bool ok = false;
+        lastT = list[0].toInt(&ok, 10);
+        hintTime = list[1].toInt(&ok, 10);
+
+        array = file.readLine();
+        str = QString(array);
+        list = str.split(" ");
+        ok = false;
+        user1.x = list[0].toInt(&ok, 10);
+        user1.y = list[1].toInt(&ok, 10);
+        user1.pts = list[2].toInt(&ok, 10);
+
+        array = file.readLine();
+        str = QString(array);
+        list = str.split(" ");
+        ok = false;
+        user2.x = list[0].toInt(&ok, 10);
+        user2.y = list[1].toInt(&ok, 10);
+        user2.pts = list[2].toInt(&ok, 10);
+    }
+
 }

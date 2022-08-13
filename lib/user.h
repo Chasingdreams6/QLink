@@ -5,6 +5,7 @@ struct User {
     int x, y, pts;
     User() {
         pts = 0;
+        x = y = -1;
     }
 };
 

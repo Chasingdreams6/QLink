@@ -19,15 +19,19 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     map.cpp \
+    pausewidget.cpp \
     user.cpp
 
 HEADERS += \
+    constant.h \
     mainwindow.h \
     map.h \
+    pausewidget.h \
     user.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    pausewidget.ui
 
 TRANSLATIONS += \
     lib_zh_CN.ts
