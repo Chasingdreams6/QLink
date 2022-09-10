@@ -24,5 +24,6 @@
         <file>images/item5_hinted.jpeg</file>
         <file>images/item6_hinted.jpeg</file>
         <file>images/hint.png</file>
+        <file>images/user2.jpeg</file>
     </qresource>
 </RCC>

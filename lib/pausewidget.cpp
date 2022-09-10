@@ -37,6 +37,6 @@ void PauseWidget::on_pushButton_clicked()
 void PauseWidget::on_pushButton_2_clicked()
 {
     emit load();
-//    this->close();
-//    emit unPause();
+    this->close();
+    emit unPause();
 }

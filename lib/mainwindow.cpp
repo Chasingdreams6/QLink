@@ -30,6 +30,7 @@ int lastT = INIT_TIME;
 Poi hint1 = Poi(-1, -1), hint2 = Poi(-1, -1);
 int hintTime = 0;
 bool isActivated = true;
+bool multiPlayerMode = true;
 User user1, user2;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -81,6 +82,7 @@ void MainWindow::generateOutSpace(enum Map item)
     }
     map[xPool[x]][yPool[y]] = item;
 }
+// 每秒结束之后的行为
 void MainWindow::updateTime()
 {
    if (!isActivated) {
@@ -93,7 +95,7 @@ void MainWindow::updateTime()
         hintTime--;
         if (!isLegalObject(hint1.x, hint1.y)
                 || !isLegalObject(hint2.x, hint2.y)
-                || !tryMatch(hint1.x, hint1.y, hint2.x, hint2.y, 0))  {
+                || !tryMatch(hint1.x, hint1.y, hint2.x, hint2.y, 0, user1))  {
             hint1 = Poi(-1, -1);
             hint2 = Poi(-1, -1);
             haveSolution(1);
@@ -107,7 +109,7 @@ void MainWindow::updateTime()
    // 依照概率生成一些方块
    const int MO = 1000;
    int rand1 = rand() % MO;
-   if  (rand1 < ADD_RATIO * MO) generateProp(ADD1);
+   if  (!multiPlayerMode && rand1 < ADD_RATIO * MO) generateProp(ADD1);
 
    rand1 = rand() % MO;
    if (rand1 < SHUFFLE_RATIO * MO) generateOutSpace(SHUFFLE);
@@ -136,6 +138,12 @@ void MainWindow::paintEvent(QPaintEvent *event)
                 graph = QPixmap(USER1_PATH);
                 user1.x = i;
                 user1.y = j;
+                break;
+            }
+            case USER2: {
+                graph = QPixmap(USER2_PATH);
+                user2.x = i;
+                user2.y = j;
                 break;
             }
             case ITEM1: {
@@ -226,7 +234,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
     painter.drawText(rec, 0, QString("剩余时间") + QString::number(lastT) + "秒");
     const QRect rec2 = QRect(400, 0, 600, 20);
     painter.drawText(rec2, 0, QString("玩家一得分：") + QString::number(user1.pts));
-    const QRect rec3 = QRect(800, 0, 1000, 20);
+    const QRect rec3 = QRect(600, 0, 1000, 20);
     painter.drawText(rec3, 0, QString("玩家二得分：") + QString::number(user2.pts));
 
 //    // 绘制暂停页面
@@ -248,13 +256,21 @@ void MainWindow::paintEvent(QPaintEvent *event)
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Up)
-        user1Move(UP);
+        move(UP, USER1);
     if (event->key() == Qt::Key_Left)
-        user1Move(LEFT);
+        move(LEFT, USER1);
     if (event->key() == Qt::Key_Right)
-        user1Move(RIGHT);
+        move(RIGHT, USER1);
     if (event->key() == Qt::Key_Down)
-        user1Move(DOWN);
+        move(DOWN, USER1);
+    if (event->key() == Qt::Key_W && multiPlayerMode)
+        move(UP, USER2);
+    if (event->key() == Qt::Key_A && multiPlayerMode)
+        move(LEFT, USER2);
+    if (event->key() == Qt::Key_D && multiPlayerMode)
+        move(RIGHT, USER2);
+    if (event->key() == Qt::Key_S && multiPlayerMode)
+        move(DOWN, USER2);
     if (event->key() == Qt::Key_P) {
         if (isActivated) {
             this->close();
@@ -329,8 +345,7 @@ bool MainWindow::haveSolution(int opt)
                 cc++;
                 //qDebug() << "try" << pool[i][j].x << " "
                         // << pool[i][j].y << " " << pool[i][k].x << " " << pool[i][k].y << endl;
-                if (tryMatch(pool[i][j].x, pool[i][j].y, pool[i][k].x, pool[i][k].y, 0)) {
-
+                if (tryMatch(pool[i][j].x, pool[i][j].y, pool[i][k].x, pool[i][k].y, 0, user1)) {
                     qDebug() << "cntok:" << cc << endl;
                     if (opt == 1) {
                        hint1 = Poi(pool[i][j].x, pool[i][j].y);
@@ -345,10 +360,18 @@ bool MainWindow::haveSolution(int opt)
     qDebug() << "cntnotok:" << cc << endl;
     return false;
 }
-void MainWindow::user1Move(enum Direction direction)
+void MainWindow::move(enum Direction direction, enum Map usr)
 {
     if (!isActivated) return ; // 如果暂停状态，没有反应
-    int curx = user1.x, cury = user1.y;
+    int curx, cury;
+    if (usr == USER1) {
+        curx = user1.x;
+        cury = user1.y;
+    }
+    else {
+        curx = user2.x;
+        cury = user2.y;
+    }
     int nxtx = curx + moveX[direction]; // 数组的顺序对应实际绘画的顺序, curx, cury是数组下标不是具体坐标
     int nxty = cury + moveY[direction];
     //qDebug() << curx << cury << nxtx << nxty << endl;
@@ -357,7 +380,7 @@ void MainWindow::user1Move(enum Direction direction)
     if (nxty < 0) nxty = COLUMN - 1;
     if (nxty == COLUMN) nxty = 0;
     if (map[nxtx][nxty] == EMPTY) { // 移动
-        map[nxtx][nxty] = USER1;
+        map[nxtx][nxty] = usr;
         map[curx][cury] = EMPTY;
     }
     if (map[nxtx][nxty] >= ITEM1 && map[nxtx][nxty] <= ITEM6) { // 选中方块
@@ -367,23 +390,25 @@ void MainWindow::user1Move(enum Direction direction)
             lasty = nxty;
         }
         else {
-            tryMatch(nxtx, nxty, lastx, lasty, 1);
+            if (usr == USER1)
+                tryMatch(nxtx, nxty, lastx, lasty, 1, user1);
+            else tryMatch(nxtx, nxty, lastx, lasty, 1, user2);
             selected[lastx][lasty] = 0;
             lastx = lasty = -1;
         }
     }
     if (map[nxtx][nxty] == ADD1) { // 触发+1s道具
         lastT += ADD_TIME;
-        map[nxtx][nxty] = USER1;
+        map[nxtx][nxty] = usr;
         map[curx][cury] = EMPTY;
     }
     if (map[nxtx][nxty] == SHUFFLE) { // 触发重排道具
-        map[nxtx][nxty] = USER1;
+        map[nxtx][nxty] = usr;
         map[curx][cury] = EMPTY;
         shuffle();
     }
     if (map[nxtx][nxty] == HINT) { // 触发提示道具
-        map[nxtx][nxty] = USER1;
+        map[nxtx][nxty] = usr;
         map[curx][cury] = EMPTY;
         hintTime += HINT_TIME;
     }
@@ -406,7 +431,7 @@ bool MainWindow::differ(int x1, int y1, int x2, int y2)
 {
     return (x1 != x2 || y1 != y2);
 }
-// 判断(x1, y1)是不是合法的方块
+// 判断(x1, y1)是不是合法的可消除方块
 bool MainWindow::isLegalObject(int x1, int y1)
 {
     if (x1 < 2 || x1 > LINE - 2)return false;
@@ -416,7 +441,7 @@ bool MainWindow::isLegalObject(int x1, int y1)
 }
 // 尝试进行(curx, cury)方块与(lastx, lasty)方块的匹配
 // opt = 0, 不消除; opt = 1，消除
-bool MainWindow::tryMatch(int curx, int cury, int lastx, int lasty, int opt)
+bool MainWindow::tryMatch(int curx, int cury, int lastx, int lasty, int opt, User& user)
 {
     bool res = false;
     reachFlag = 0;
@@ -429,7 +454,7 @@ bool MainWindow::tryMatch(int curx, int cury, int lastx, int lasty, int opt)
         map[curx][cury] == map[lastx][lasty] &&
         dfs(curx, cury, lastx, lasty, 0, ALLTYPE, opt)) { // 成功在两个转弯之内匹配
             if (opt == 1) {
-                user1.pts += points[map[curx][cury] - ITEM1];
+                user.pts += points[map[curx][cury] - ITEM1];
                 map[curx][cury] = EMPTY;
                 map[lastx][lasty] = EMPTY;
             }
@@ -499,7 +524,9 @@ void MainWindow::generateMap(int level)
     }
 
     generateBlocks(level);
-    generatePeople();
+    generatePeople(USER1);
+    if (multiPlayerMode)
+        generatePeople(USER2);
 }
 
 void MainWindow::generateBlocks(int level)
@@ -524,7 +551,7 @@ void MainWindow::generateBlocks(int level)
     }
 }
 
-void MainWindow::generatePeople()
+void MainWindow::generatePeople(enum Map usr)
 {
     int xpos[] = {0, 1, COLUMN - 2, COLUMN - 1};
     int ypos[] = {0, 1, LINE - 2, LINE - 1};
@@ -533,7 +560,7 @@ void MainWindow::generatePeople()
         x1 = xpos[rand() % 4];
         y1 = ypos[rand() % 4];
     }
-    map[y1][x1] = USER1;
+    map[y1][x1] = usr;
 }
 
 // 存档

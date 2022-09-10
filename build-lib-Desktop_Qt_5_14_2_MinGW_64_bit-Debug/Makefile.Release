@@ -141,6 +141,7 @@ release/qrc_images.cpp: ../lib/images.qrc \
 		../lib/images/item2_selected.jpeg \
 		../lib/images/item5_selected.jpeg \
 		../lib/images/item5.jpeg \
+		../lib/images/user2.jpeg \
 		../lib/images/item1_hinted.jpeg \
 		../lib/images/item2_hinted.jpeg \
 		../lib/images/item3_hinted.jpeg \
@@ -270,7 +271,9 @@ release/moc_mainwindow.cpp: ../lib/mainwindow.h \
 		../lib/map.h \
 		../lib/pausewidget.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QWidget \
+		../../../../Qt/5.14.2/mingw73_64/include/QtGui/QMouseEvent \
 		../lib/constant.h \
+		../lib/user.h \
 		release/moc_predefs.h \
 		../../../../Qt/5.14.2/mingw73_64/bin/moc.exe
 	E:\Qt\5.14.2\mingw73_64\bin\moc.exe $(DEFINES) --include E:/sep_new_2022/summer_project/QLink/build-lib-Desktop_Qt_5_14_2_MinGW_64_bit-Debug/release/moc_predefs.h -IE:/Qt/5.14.2/mingw73_64/mkspecs/win32-g++ -IE:/sep_new_2022/summer_project/QLink/lib -IE:/Qt/5.14.2/mingw73_64/include -IE:/Qt/5.14.2/mingw73_64/include/QtWidgets -IE:/Qt/5.14.2/mingw73_64/include/QtGui -IE:/Qt/5.14.2/mingw73_64/include/QtANGLE -IE:/Qt/5.14.2/mingw73_64/include/QtCore -I. -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++ -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32 -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed -IE:/Qt/Tools/mingw730_64/x86_64-w64-mingw32/include ..\lib\mainwindow.h -o release\moc_mainwindow.cpp
@@ -380,6 +383,7 @@ release/moc_pausewidget.cpp: ../lib/pausewidget.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qfiledevice.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qvector2d.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qtouchdevice.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtGui/QMouseEvent \
 		release/moc_predefs.h \
 		../../../../Qt/5.14.2/mingw73_64/bin/moc.exe
 	E:\Qt\5.14.2\mingw73_64\bin\moc.exe $(DEFINES) --include E:/sep_new_2022/summer_project/QLink/build-lib-Desktop_Qt_5_14_2_MinGW_64_bit-Debug/release/moc_predefs.h -IE:/Qt/5.14.2/mingw73_64/mkspecs/win32-g++ -IE:/sep_new_2022/summer_project/QLink/lib -IE:/Qt/5.14.2/mingw73_64/include -IE:/Qt/5.14.2/mingw73_64/include/QtWidgets -IE:/Qt/5.14.2/mingw73_64/include/QtGui -IE:/Qt/5.14.2/mingw73_64/include/QtANGLE -IE:/Qt/5.14.2/mingw73_64/include/QtCore -I. -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++ -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/x86_64-w64-mingw32 -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/backward -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include -IE:/Qt/Tools/mingw730_64/lib/gcc/x86_64-w64-mingw32/7.3.0/include-fixed -IE:/Qt/Tools/mingw730_64/x86_64-w64-mingw32/include ..\lib\pausewidget.h -o release\moc_pausewidget.cpp
@@ -523,7 +527,9 @@ release/main.o: ../lib/main.cpp ../lib/mainwindow.h \
 		../lib/map.h \
 		../lib/pausewidget.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QWidget \
+		../../../../Qt/5.14.2/mingw73_64/include/QtGui/QMouseEvent \
 		../lib/constant.h \
+		../lib/user.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QApplication \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qapplication.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qcoreapplication.h \
@@ -645,12 +651,13 @@ release/mainwindow.o: ../lib/mainwindow.cpp ../lib/mainwindow.h \
 		../lib/map.h \
 		../lib/pausewidget.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QWidget \
+		../../../../Qt/5.14.2/mingw73_64/include/QtGui/QMouseEvent \
 		../lib/constant.h \
+		../lib/user.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/QPainter \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qpainter.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qtextoption.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qpen.h \
-		../lib/user.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtCore/QDebug \
 		../../../../Qt/5.14.2/mingw73_64/include/QtCore/QTimer \
 		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qtimer.h \
@@ -661,13 +668,20 @@ release/mainwindow.o: ../lib/mainwindow.cpp ../lib/mainwindow.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qlayoutitem.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qgridlayout.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QVBoxLayout \
-		../../../../Qt/5.14.2/mingw73_64/include/QtGui/QMouseEvent \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QPushButton \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qpushbutton.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qabstractbutton.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QLabel \
 		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qlabel.h \
-		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qframe.h
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qframe.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QFileDialog \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qfiledialog.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qdir.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qfileinfo.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qdialog.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/QFile \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/QTime \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qdatetime.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\mainwindow.o ..\lib\mainwindow.cpp
 
 release/map.o: ../lib/map.cpp ../lib/map.h
@@ -778,7 +792,24 @@ release/pausewidget.o: ../lib/pausewidget.cpp ../lib/pausewidget.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qfiledevice.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qvector2d.h \
 		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qtouchdevice.h \
-		ui_pausewidget.h
+		../../../../Qt/5.14.2/mingw73_64/include/QtGui/QMouseEvent \
+		ui_pausewidget.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/QVariant \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QApplication \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qapplication.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qcoreapplication.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtCore/qeventloop.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qdesktopwidget.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qguiapplication.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qinputmethod.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QLabel \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qlabel.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qframe.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/QPushButton \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qpushbutton.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtWidgets/qabstractbutton.h \
+		../../../../Qt/5.14.2/mingw73_64/include/QtGui/qicon.h \
+		../lib/constant.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\pausewidget.o ..\lib\pausewidget.cpp
 
 release/user.o: ../lib/user.cpp ../lib/user.h

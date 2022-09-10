@@ -26,6 +26,7 @@
 #define ITEM5_PATH ":/images/item5.jpeg"
 #define ITEM6_PATH ":/images/item6.jpeg"
 #define USER1_PATH ":/images/user1.jpeg"
+#define USER2_PATH ":/images/user2.jpeg"
 #define ADD1_PATH ":/images/add1.png"
 #define SHUFFLE_PATH ":/images/shuffle.png"
 #define HINT_PATH ":/images/hint.png"

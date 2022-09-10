@@ -7,6 +7,7 @@
 #include "map.h"
 #include "pausewidget.h"
 #include "constant.h"
+#include "user.h"
 
 class MainWindow : public QMainWindow
 {
@@ -19,12 +20,12 @@ public:
 private:
     PauseWidget *pauseWidget;
     void generateMap(int level);
-    void generatePeople();
+    void generatePeople(enum Map);
     void generateBlocks(int level);
     void generateProp(enum Map);
     void generateOutSpace(enum Map);
-    void user1Move(enum Direction);
-    bool tryMatch(int curx, int cury, int lastx, int lasty, int opt);
+    void move(enum Direction, enum Map);
+    bool tryMatch(int curx, int cury, int lastx, int lasty, int opt, User&);
     bool dfs(int curx, int cury, int lastx, int lasty, int countTurns, enum LastMove, int opt);
     void drawLine();
     bool differ(int x1, int y1, int x2, int y2);
