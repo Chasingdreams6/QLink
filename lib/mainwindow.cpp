@@ -29,8 +29,8 @@ int lastx = -1, lasty = -1;
 int lastT = INIT_TIME;
 Poi hint1 = Poi(-1, -1), hint2 = Poi(-1, -1);
 int hintTime = 0;
-bool isActivated = true;
-bool multiPlayerMode = true;
+bool isActivated = false;
+bool multiPlayerMode = false;
 User user1, user2;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -49,6 +49,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(pauseWidget, SIGNAL(unPause()), this, SLOT(unPause()));
     connect(pauseWidget, SIGNAL(save()), this, SLOT(writeFile()));
     connect(pauseWidget, SIGNAL(load()), this, SLOT(readFile()));
+
+    startPage = new StartPage;
+    connect(startPage, SIGNAL(singleMode()), this, SLOT(singleMode()));
+    connect(startPage, SIGNAL(multiMode()), this, SLOT(multiMode()));
+    this->close();
+    startPage->show();
 }
 
 MainWindow::~MainWindow()
@@ -56,6 +62,16 @@ MainWindow::~MainWindow()
 
 }
 
+void MainWindow::singleMode()
+{
+    multiPlayerMode = false;
+    unPause();
+}
+void MainWindow::multiMode()
+{
+    multiPlayerMode = true;
+    unPause();
+}
 void MainWindow::generateProp(enum Map item)
 {
     int x = rand() % LINE, y = rand() % COLUMN;
@@ -236,21 +252,6 @@ void MainWindow::paintEvent(QPaintEvent *event)
     painter.drawText(rec2, 0, QString("玩家一得分：") + QString::number(user1.pts));
     const QRect rec3 = QRect(600, 0, 1000, 20);
     painter.drawText(rec3, 0, QString("玩家二得分：") + QString::number(user2.pts));
-
-//    // 绘制暂停页面
-//    if (!isActivated) {
-//        qDebug() << "show pause page" << endl;
-//        QVBoxLayout *vbox = new QVBoxLayout(this);
-//        QPushButton *saveButton = new QPushButton("保存", this);
-//        QPushButton *loadButton = new QPushButton("载入", this);
-//        QLabel *header = new QLabel("暂停", this);
-//        vbox->addWidget(header);
-//        vbox->addWidget(saveButton);
-//        vbox->addWidget(loadButton);
-//        QRect rec = QRect(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 60, 200);
-//        vbox->setGeometry(rec);
-//        //this->setLayout(vbox);
-//    }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)

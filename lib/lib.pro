@@ -20,6 +20,7 @@ SOURCES += \
     mainwindow.cpp \
     map.cpp \
     pausewidget.cpp \
+    startpage.cpp \
     user.cpp
 
 HEADERS += \
@@ -27,11 +28,13 @@ HEADERS += \
     mainwindow.h \
     map.h \
     pausewidget.h \
+    startpage.h \
     user.h
 
 FORMS += \
     mainwindow.ui \
-    pausewidget.ui
+    pausewidget.ui \
+    startpage.ui
 
 TRANSLATIONS += \
     lib_zh_CN.ts

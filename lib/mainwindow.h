@@ -8,6 +8,7 @@
 #include "pausewidget.h"
 #include "constant.h"
 #include "user.h"
+#include "startpage.h"
 
 class MainWindow : public QMainWindow
 {
@@ -19,6 +20,7 @@ public:
 
 private:
     PauseWidget *pauseWidget;
+    StartPage *startPage;
     void generateMap(int level);
     void generatePeople(enum Map);
     void generateBlocks(int level);
@@ -48,5 +50,7 @@ public slots:
     void unPause();
     void writeFile();
     void readFile();
+    void singleMode();
+    void multiMode();
 };
 #endif // MAINWINDOW_H
