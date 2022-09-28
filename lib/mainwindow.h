@@ -15,6 +15,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    bool tryMatch(int curx, int cury, int lastx, int lasty, int opt, User&);
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
@@ -27,7 +28,6 @@ private:
     void generateProp(enum Map);
     void generateOutSpace(enum Map);
     void move(enum Direction, enum Map);
-    bool tryMatch(int curx, int cury, int lastx, int lasty, int opt, User&);
     bool dfs(int curx, int cury, int lastx, int lasty, int countTurns, enum LastMove, int opt);
     void drawLine();
     bool differ(int x1, int y1, int x2, int y2);
@@ -52,5 +52,6 @@ public slots:
     void readFile();
     void singleMode();
     void multiMode();
+    void endGame(); // quit
 };
 #endif // MAINWINDOW_H

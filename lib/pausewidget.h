@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PAUSEWIDGET_H
 #define PAUSEWIDGET_H
 

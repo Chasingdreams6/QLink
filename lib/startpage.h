@@ -1,3 +1,4 @@
+#pragma once
 #ifndef STARTPAGE_H
 #define STARTPAGE_H
 
@@ -20,12 +21,18 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
+
 private:
     Ui::StartPage *ui;
 
 signals:
     void singleMode();
     void multiMode();
+    void endGame();
+    void load();
 };
 
 #endif // STARTPAGE_H

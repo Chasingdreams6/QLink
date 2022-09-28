@@ -29,3 +29,15 @@ void StartPage::on_pushButton_2_clicked()
     this->close();
     emit multiMode();
 }
+
+void StartPage::on_pushButton_3_clicked()
+{
+    this->close();
+    emit endGame();
+}
+
+void StartPage::on_pushButton_4_clicked()
+{
+    this->close();
+    emit load();
+}

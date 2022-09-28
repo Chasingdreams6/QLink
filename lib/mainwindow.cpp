@@ -18,7 +18,7 @@
 int moveX[] = {-1, 1, 0, 0}; // 上下左右 对应的数组下标变化
 int moveY[] = {0, 0, -1, 1};
 const int points[] = {100, 90, 80, 70, 60, 50};
-
+int level = 6;
 
 int map[LINE][COLUMN];
 int selected[LINE][COLUMN];
@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer *timer = new QTimer(this);
     resize(SCREEN_WIDTH, SCREEN_HEIGHT);
     setWindowIconText(QString("QLink"));
-    generateMap(6);
+
     connect(this, SIGNAL(change()), this, SLOT(update()));
     connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
     timer->start(1000);
@@ -50,10 +50,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(pauseWidget, SIGNAL(save()), this, SLOT(writeFile()));
     connect(pauseWidget, SIGNAL(load()), this, SLOT(readFile()));
 
+    //this->close();
     startPage = new StartPage;
     connect(startPage, SIGNAL(singleMode()), this, SLOT(singleMode()));
     connect(startPage, SIGNAL(multiMode()), this, SLOT(multiMode()));
-    this->close();
+    connect(startPage, SIGNAL(endGame()), this, SLOT(endGame()));
+    connect(startPage, SIGNAL(load()), this, SLOT(readFile()));
     startPage->show();
 }
 
@@ -65,13 +67,22 @@ MainWindow::~MainWindow()
 void MainWindow::singleMode()
 {
     multiPlayerMode = false;
+    generateMap(level);
+    this->show();
     unPause();
 }
 void MainWindow::multiMode()
 {
     multiPlayerMode = true;
+    generateMap(level);
+    this->show();
     unPause();
 }
+void MainWindow::endGame()
+{
+    this->close();
+}
+
 void MainWindow::generateProp(enum Map item)
 {
     int x = rand() % LINE, y = rand() % COLUMN;
@@ -444,6 +455,8 @@ bool MainWindow::isLegalObject(int x1, int y1)
 // opt = 0, 不消除; opt = 1，消除
 bool MainWindow::tryMatch(int curx, int cury, int lastx, int lasty, int opt, User& user)
 {
+    if (!isLegalObject(curx, cury) || !isLegalObject(lastx, lasty)) return false;
+
     bool res = false;
     reachFlag = 0;
     cntPath = 0;
@@ -526,8 +539,10 @@ void MainWindow::generateMap(int level)
 
     generateBlocks(level);
     generatePeople(USER1);
-    if (multiPlayerMode)
+    if (multiPlayerMode) {
+        qDebug() << "multi" << endl;
         generatePeople(USER2);
+    }
 }
 
 void MainWindow::generateBlocks(int level)
@@ -588,6 +603,8 @@ void MainWindow::writeFile()
 }
 void MainWindow::readFile()
 {
+    this->show();
+
     QString path = QFileDialog::getOpenFileName(this, "载入", "C:\\Users\\19026\\Desktop\\");
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return ;
@@ -625,4 +642,5 @@ void MainWindow::readFile()
         user2.pts = list[2].toInt(&ok, 10);
     }
 
+    unPause();
 }
