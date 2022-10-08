@@ -11,7 +11,7 @@ void MatchTest::testLegal()
 {
     QVERIFY(1 == 1);
     MainWindow w;
-    int tmp[LINE][COLUMN] = {
+    int tmp[13][16] = {
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,4,4,7,8,4,4,3,7,7,4,6,0,0,0},
@@ -26,9 +26,9 @@ void MatchTest::testLegal()
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
     };
-    extern int map[LINE][COLUMN];
-    for (int i = 0; i < LINE; ++i) {
-        for (int j = 0; j < COLUMN; ++j) {
+    extern int map[13][16];
+    for (int i = 0; i < 13; ++i) {
+        for (int j = 0; j < 16; ++j) {
             map[i][j] = tmp[i][j];
         }
     }

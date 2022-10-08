@@ -124,8 +124,8 @@ void MainWindow::updateTime()
        return ;
    }
 
-   /*没有解，打印游戏结束*/
-   if (!haveSolution(0)) {
+   /*时间结束或者没有解，打印游戏结束*/
+   if (lastT <= 0 || !haveSolution(0)) {
         endGame();
         return ;
    }

@@ -3,14 +3,14 @@
 #define CONSTANT_H
 
 
-#define SCREEN_WIDTH 960 // 屏幕宽度
-#define SCREEN_HEIGHT 880 // 屏幕高度
-#define LINE 13 // 地图行数
-#define COLUMN 16 // 地图列数
+#define SCREEN_WIDTH 960 // 屏幕宽度至少960
+#define SCREEN_HEIGHT 880 // 屏幕高度至少880
+#define LINE 13 // 地图行数默认13, 行和列至少得有一个偶数使得有解，不同line/column的档不能互通
+#define COLUMN 16 // 地图列数默认16， test是针对13*16写的，修改需要屏蔽test
 #define SIZE 60 // 每一个方块的像素大小
-#define X_SHIFT 0 // 左右偏移
-#define Y_SHIFT 112 // 上下偏移
-#define INIT_TIME 180   // 初始游戏时间
+#define X_SHIFT ((SCREEN_WIDTH - COLUMN * SIZE) / 2) // 左右偏移，使得页面在中央
+#define Y_SHIFT (SCREEN_HEIGHT - LINE * SIZE) // 上下偏移
+#define INIT_TIME 180   // 初始游戏时间180s
 #define ADD_TIME 10 // +1s道具的增加时长
 #define ADD_RATIO 0.05 // +1s道具每一秒的出现概率
 #define SHUFFLE_RATIO 0.05
