@@ -9,6 +9,7 @@
 #include "constant.h"
 #include "user.h"
 #include "startpage.h"
+#include "endpage.h"
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +23,7 @@ public:
 private:
     PauseWidget *pauseWidget;
     StartPage *startPage;
+    EndPage *endPage;
     void generateMap(int level);
     void generatePeople(enum Map);
     void generateBlocks(int level);
@@ -33,7 +35,6 @@ private:
     bool differ(int x1, int y1, int x2, int y2);
     bool isSurrounded(int x1, int y1);
     bool isOutside(int x1, int y1);
-    bool isObjects(const int &x1, const int &y1);
     bool haveSolution(int opt);
     void shuffle();
     bool isHinted(int x1, int y1);

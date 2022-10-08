@@ -16,6 +16,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    endpage.cpp \
+    helppage.cpp \
     main.cpp \
     mainwindow.cpp \
     map.cpp \
@@ -26,6 +28,8 @@ SOURCES += \
 
 HEADERS += \
     constant.h \
+    endpage.h \
+    helppage.h \
     mainwindow.h \
     map.h \
     matchtest.h \
@@ -34,6 +38,8 @@ HEADERS += \
     user.h
 
 FORMS += \
+    endpage.ui \
+    helppage.ui \
     mainwindow.ui \
     pausewidget.ui \
     startpage.ui

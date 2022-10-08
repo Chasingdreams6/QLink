@@ -17,7 +17,7 @@
 #define HINT_RATIO 0.05 // hint道具每秒的出现概率
 #define SHUFFLE_CNT 50 //  交换次数
 #define HINT_TIME 10 // 提示时间
-#define RANDOM_LIM 10
+#define RANDOM_LIM 10 // 一个随机次数的上限
 
 #define BACKGROUND_PATH ":/images/blackground.bmp"
 #define ITEM1_PATH ":/images/item1.jpeg"

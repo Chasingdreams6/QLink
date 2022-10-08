@@ -40,3 +40,10 @@ void PauseWidget::on_pushButton_2_clicked()
     this->close();
     emit unPause();
 }
+
+void PauseWidget::on_pushButton_3_clicked()
+{
+    emit unPause();
+    emit endGame();
+    this->close();
+}

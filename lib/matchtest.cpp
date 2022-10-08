@@ -42,4 +42,4 @@ void MatchTest::testLegal()
     QVERIFY(w.tryMatch(5, 11, 4, 13, 0, usr) == true);
 }
 
-QTEST_MAIN(MatchTest);
+//QTEST_MAIN(MatchTest);

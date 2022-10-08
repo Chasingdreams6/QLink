@@ -36,6 +36,7 @@ User user1, user2;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    // 主页面与时钟
     QTimer *timer = new QTimer(this);
     resize(SCREEN_WIDTH, SCREEN_HEIGHT);
     setWindowIconText(QString("QLink"));
@@ -44,19 +45,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
     timer->start(1000);
 
+    // 暂停页面
     pauseWidget = new PauseWidget;
     connect(this, SIGNAL(pause()), pauseWidget, SLOT(showWindow()));
     connect(pauseWidget, SIGNAL(unPause()), this, SLOT(unPause()));
     connect(pauseWidget, SIGNAL(save()), this, SLOT(writeFile()));
     connect(pauseWidget, SIGNAL(load()), this, SLOT(readFile()));
+    connect(pauseWidget, SIGNAL(endGame()), this, SLOT(endGame()));
 
-    //this->close();
+    //开始页面
     startPage = new StartPage;
     connect(startPage, SIGNAL(singleMode()), this, SLOT(singleMode()));
     connect(startPage, SIGNAL(multiMode()), this, SLOT(multiMode()));
     connect(startPage, SIGNAL(endGame()), this, SLOT(endGame()));
     connect(startPage, SIGNAL(load()), this, SLOT(readFile()));
     startPage->show();
+
+    // 结束页面
+    endPage = new EndPage;
 }
 
 MainWindow::~MainWindow()
@@ -80,6 +86,7 @@ void MainWindow::multiMode()
 }
 void MainWindow::endGame()
 {
+    endPage->showScore(user1.pts, user2.pts);
     this->close();
 }
 
@@ -117,6 +124,12 @@ void MainWindow::updateTime()
        return ;
    }
 
+   /*没有解，打印游戏结束*/
+   if (!haveSolution(0)) {
+        endGame();
+        return ;
+   }
+
    lastT--;
    if (hintTime > 0) { // 生成两个提示方块
         hintTime--;
@@ -132,7 +145,7 @@ void MainWindow::updateTime()
        hint1 = Poi(-1, -1);
        hint2 = Poi(-1, -1);
    }
-   qDebug() << "t:" << lastT << " hint: " << hint1.x << " " << hint1.y << " " << hint2.x << " " <<hint2.y << endl;
+   //qDebug() << "t:" << lastT << " hint: " << hint1.x << " " << hint1.y << " " << hint2.x << " " <<hint2.y << endl;
    // 依照概率生成一些方块
    const int MO = 1000;
    int rand1 = rand() % MO;
@@ -142,7 +155,7 @@ void MainWindow::updateTime()
    if (rand1 < SHUFFLE_RATIO * MO) generateOutSpace(SHUFFLE);
 
    rand1 = rand() % MO;
-   if (rand1 < HINT_RATIO * MO) generateProp(HINT);
+   if (!multiPlayerMode && rand1 < HINT_RATIO * MO) generateProp(HINT);
    emit change();
 }
 bool MainWindow::isHinted(int x1, int y1) // 判断一个方块是不是高亮方块
@@ -157,6 +170,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.drawPixmap(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, QPixmap(BACKGROUND_PATH));
 
+    /* 绘制画面主体*/
     for (int i = 0; i < LINE; ++i) {
         for (int j = 0; j < COLUMN; ++j) {
             QPixmap graph;
@@ -262,11 +276,14 @@ void MainWindow::paintEvent(QPaintEvent *event)
     const QRect rec2 = QRect(400, 0, 600, 20);
     painter.drawText(rec2, 0, QString("玩家一得分：") + QString::number(user1.pts));
     const QRect rec3 = QRect(600, 0, 1000, 20);
-    painter.drawText(rec3, 0, QString("玩家二得分：") + QString::number(user2.pts));
+    if (multiPlayerMode)
+        painter.drawText(rec3, 0, QString("玩家二得分：") + QString::number(user2.pts));
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    if (event->key() == Qt::Key_Escape)
+        endGame();
     if (event->key() == Qt::Key_Up)
         move(UP, USER1);
     if (event->key() == Qt::Key_Left)
@@ -296,22 +313,19 @@ void MainWindow::unPause()
     isActivated = !isActivated;
     this->show();
 }
-bool MainWindow::isObjects(const int &x1, const int &y1)
-{
-    return (map[x1][y1] >= ITEM1 && map[x1][y1] <= ITEM6);
-}
 
 bool MainWindow::isSurrounded(int x1, int y1)
 {
     bool res = true;
-    if (x1 + 1 < COLUMN) res &= isObjects(x1 + 1, y1);
-    if (y1 + 1 < LINE) res &= isObjects(x1, y1 + 1);
-    if (x1 > 0) res &= isObjects(x1 - 1, y1);
-    if (y1 > 0) res &= isObjects(x1, y1 - 1);
+    if (x1 + 1 < COLUMN) res &= isLegalObject(x1 + 1, y1);
+    if (y1 + 1 < LINE) res &= isLegalObject(x1, y1 + 1);
+    if (x1 > 0) res &= isLegalObject(x1 - 1, y1);
+    if (y1 > 0) res &= isLegalObject(x1, y1 - 1);
     return res;
 }
 
 // 判断一个方块是否可达
+// 使用bfs
 bool MainWindow::isOutside(int x1, int y1)
 {
     int vis[LINE][COLUMN];
@@ -324,41 +338,40 @@ bool MainWindow::isOutside(int x1, int y1)
         int curx = que.front().x, cury = que.front().y;
         que.pop();
         vis[curx][cury] = 1;
-        if (curx < 2 || curx > LINE - 2 || cury < 2 || cury > COLUMN - 2) {
+        if (curx < 2 || curx > LINE - 2 || cury < 2 || cury > COLUMN - 2) { // 到达外边界
             return true;
         }
         for (int i = 0; i < 4; ++i) {
             int nxtx = curx + moveX[i], nxty = cury + moveY[i];
-            if (nxtx >= LINE || nxtx < 0 || nxty >= COLUMN || nxty < 0) continue;
-            if (isObjects(nxtx, nxty)) continue;
-            if (vis[nxtx][nxty]) continue;
+            if (nxtx >= LINE || nxtx < 0 || nxty >= COLUMN || nxty < 0) continue; // 溢出地图
+            if (isLegalObject(nxtx, nxty)) continue; // 被待消除方块阻挡
+            if (vis[nxtx][nxty]) continue; // 已经访问过
             que.push(Poi(nxtx, nxty));
         }
     }
     return false;
 }
-// opt = 0, 只判断有没有解
+// opt = 0, 只判断还能不能消除方块，不能消除代表游戏结束
 // opt = 1， hint道具调用，需要高亮出解
+// 不真正去消除方块
 bool MainWindow::haveSolution(int opt)
 {
-    std::vector<Poi> pool[6];
+    std::vector<Poi> pool[10];
     for (int i = 0; i < LINE; ++i) {
         for (int j = 0; j < COLUMN; ++j) {
-            if (isObjects(i, j) && isOutside(i, j)) {
+            if (isLegalObject(i, j) && isOutside(i, j)) {
                 pool[map[i][j] - ITEM1].push_back(Poi(i, j));
             }
         }
     }
     int cc = 0;
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < level; ++i) { // 对于每个种类的方块
         int size = pool[i].size();
-        for (int j = 0; j < size; ++j) {
+        for (int j = 0; j < size; ++j) { // 枚举两个方块
             for (int k = j + 1; k < size; ++k) {
-                cc++;
-                //qDebug() << "try" << pool[i][j].x << " "
-                        // << pool[i][j].y << " " << pool[i][k].x << " " << pool[i][k].y << endl;
-                if (tryMatch(pool[i][j].x, pool[i][j].y, pool[i][k].x, pool[i][k].y, 0, user1)) {
-                    qDebug() << "cntok:" << cc << endl;
+                //cc++;
+                if (tryMatch(pool[i][j].x, pool[i][j].y, pool[i][k].x, pool[i][k].y, 0, user1)) { // 判断是否可达
+                    //qDebug() << "cntok:" << cc << endl;
                     if (opt == 1) {
                        hint1 = Poi(pool[i][j].x, pool[i][j].y);
                        hint2 = Poi(pool[i][k].x, pool[i][k].y);
@@ -369,7 +382,7 @@ bool MainWindow::haveSolution(int opt)
             }
         }
     }
-    qDebug() << "cntnotok:" << cc << endl;
+    //qDebug() << "cntnotok:" << cc << endl;
     return false;
 }
 void MainWindow::move(enum Direction direction, enum Map usr)
@@ -395,7 +408,7 @@ void MainWindow::move(enum Direction direction, enum Map usr)
         map[nxtx][nxty] = usr;
         map[curx][cury] = EMPTY;
     }
-    if (map[nxtx][nxty] >= ITEM1 && map[nxtx][nxty] <= ITEM6) { // 选中方块
+    if (isLegalObject(nxtx, nxty)) { // 该方块是一个待消除方块
         if (lastx == -1) {
             selected[nxtx][nxty] = 1;
             lastx = nxtx;
@@ -429,11 +442,11 @@ void MainWindow::move(enum Direction direction, enum Map usr)
 
 void MainWindow::shuffle() // 重排
 {
-    if (lastx != -1) {
+    if (lastx != -1) { // 取消选中效果
         selected[lastx][lasty] = 1 - selected[lastx][lasty];
         lastx = lasty = -1;
     }
-    for (int i = 0; i < SHUFFLE_CNT; ++i) {
+    for (int i = 0; i < SHUFFLE_CNT; ++i) { // 重排网格内的方块
         int x1 = rand() % (LINE - 4) + 2, y1 = rand() % (COLUMN - 4) + 2;
         int x2 = rand() % (LINE - 4) + 2, y2 = rand() % (COLUMN - 4) + 2;
         std::swap(map[x1][y1], map[x2][y2]);
@@ -526,6 +539,7 @@ void MainWindow::drawLine()
     }
 }
 // level 表示最大出现的方块种类数
+// 顶层函数，生成待消除方块和人
 void MainWindow::generateMap(int level)
 {
     srand(time(NULL));

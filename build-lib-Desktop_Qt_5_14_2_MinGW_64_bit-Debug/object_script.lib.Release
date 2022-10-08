@@ -1,0 +1,16 @@
+release/endpage.o
+release/helppage.o
+release/main.o
+release/mainwindow.o
+release/map.o
+release/matchtest.o
+release/pausewidget.o
+release/startpage.o
+release/user.o
+release/qrc_images.o
+release/moc_endpage.o
+release/moc_helppage.o
+release/moc_mainwindow.o
+release/moc_matchtest.o
+release/moc_pausewidget.o
+release/moc_startpage.o

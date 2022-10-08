@@ -1,0 +1,16 @@
+debug/endpage.o
+debug/helppage.o
+debug/main.o
+debug/mainwindow.o
+debug/map.o
+debug/matchtest.o
+debug/pausewidget.o
+debug/startpage.o
+debug/user.o
+debug/qrc_images.o
+debug/moc_endpage.o
+debug/moc_helppage.o
+debug/moc_mainwindow.o
+debug/moc_matchtest.o
+debug/moc_pausewidget.o
+debug/moc_startpage.o

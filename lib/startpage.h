@@ -3,6 +3,7 @@
 #define STARTPAGE_H
 
 #include <QWidget>
+#include "helppage.h"
 
 namespace Ui {
 class StartPage;
@@ -25,8 +26,11 @@ private slots:
 
     void on_pushButton_4_clicked();
 
+    void on_pushButton_5_clicked();
+
 private:
     Ui::StartPage *ui;
+    HelpPage helpPage;
 
 signals:
     void singleMode();

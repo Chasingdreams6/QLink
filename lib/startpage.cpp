@@ -41,3 +41,8 @@ void StartPage::on_pushButton_4_clicked()
     this->close();
     emit load();
 }
+
+void StartPage::on_pushButton_5_clicked()
+{
+    helpPage.showText();
+}

@@ -23,6 +23,7 @@ public:
     QLabel *label;
     QPushButton *pushButton;
     QPushButton *pushButton_2;
+    QPushButton *pushButton_3;
 
     void setupUi(QWidget *PauseWidget)
     {
@@ -42,6 +43,9 @@ public:
         pushButton_2 = new QPushButton(PauseWidget);
         pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
         pushButton_2->setGeometry(QRect(420, 410, 93, 28));
+        pushButton_3 = new QPushButton(PauseWidget);
+        pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
+        pushButton_3->setGeometry(QRect(420, 470, 93, 28));
 
         retranslateUi(PauseWidget);
 
@@ -54,6 +58,7 @@ public:
         label->setText(QCoreApplication::translate("PauseWidget", "\346\232\202\345\201\234", nullptr));
         pushButton->setText(QCoreApplication::translate("PauseWidget", "\344\277\235\345\255\230", nullptr));
         pushButton_2->setText(QCoreApplication::translate("PauseWidget", "\350\275\275\345\205\245", nullptr));
+        pushButton_3->setText(QCoreApplication::translate("PauseWidget", "\347\273\223\346\235\237", nullptr));
     } // retranslateUi
 
 };
