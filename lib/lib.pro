@@ -35,7 +35,8 @@ HEADERS += \
     matchtest.h \
     pausewidget.h \
     startpage.h \
-    user.h
+    user.h \
+    vars.h
 
 FORMS += \
     endpage.ui \

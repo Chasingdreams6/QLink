@@ -10,7 +10,6 @@
 #define SIZE 60 // 每一个方块的像素大小
 #define X_SHIFT ((SCREEN_WIDTH - COLUMN * SIZE) / 2) // 左右偏移，使得页面在中央
 #define Y_SHIFT (SCREEN_HEIGHT - LINE * SIZE) // 上下偏移
-#define INIT_TIME 180   // 初始游戏时间180s
 #define ADD_TIME 10 // +1s道具的增加时长
 #define ADD_RATIO 0.05 // +1s道具每一秒的出现概率
 #define SHUFFLE_RATIO 0.05
@@ -18,7 +17,6 @@
 #define SHUFFLE_CNT 50 //  交换次数
 #define HINT_TIME 10 // 提示时间
 #define RANDOM_LIM 10 // 一个随机次数的上限
-
 #define BACKGROUND_PATH ":/images/blackground.bmp"
 #define ITEM1_PATH ":/images/item1.jpeg"
 #define ITEM2_PATH ":/images/item2.jpeg"

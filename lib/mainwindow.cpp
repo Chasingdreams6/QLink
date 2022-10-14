@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "map.h"
+#include "vars.h"
 #include "QPainter"
 #include "user.h"
 #include "QDebug"
@@ -18,14 +19,14 @@
 int moveX[] = {-1, 1, 0, 0}; // 上下左右 对应的数组下标变化
 int moveY[] = {0, 0, -1, 1};
 const int points[] = {100, 90, 80, 70, 60, 50};
-int level = 6;  // curmax is 6
+int level = 6;
+int lastT = 180;
 
 int map[LINE][COLUMN];
 int selected[LINE][COLUMN];
 int visited[LINE][COLUMN];
 int cntPath, reachFlag;
 Poi path[LINE * COLUMN];
-int lastT = INIT_TIME;
 Poi hint1 = Poi(-1, -1), hint2 = Poi(-1, -1);
 int hintTime = 0;
 bool isActivated = false;

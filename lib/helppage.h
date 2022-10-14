@@ -2,6 +2,7 @@
 #ifndef HELPPAGE_H
 #define HELPPAGE_H
 
+#include "constant.h"
 #include <QWidget>
 
 namespace Ui {
@@ -16,6 +17,11 @@ public:
     explicit HelpPage(QWidget *parent = nullptr);
     ~HelpPage();
     void showText();
+
+private slots:
+    void on_spinBox_valueChanged(int arg1);
+
+    void on_spinBox_2_valueChanged(int arg1);
 
 private:
     Ui::HelpPage *ui;
