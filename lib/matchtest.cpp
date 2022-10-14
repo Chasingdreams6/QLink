@@ -32,13 +32,13 @@ void MatchTest::testLegal()
             map[i][j] = tmp[i][j];
         }
     }
-    User usr;
-    QVERIFY(w.tryMatch(2, 2, 2, 3, 0, usr) == true);
-    QVERIFY(w.tryMatch(2, 2, 2, 4, 0, usr) == false);
+    User usr(USER1);
+    QVERIFY(w.tryMatch(2, 2, 2, 3, 0, usr) == true); // ok
+    QVERIFY(w.tryMatch(2, 2, 2, 4, 0, usr) == false); // not ok
     QVERIFY(w.tryMatch(0, 2, 2, 4, 0, usr) == false);
     QVERIFY(w.tryMatch(0, 46436, 2, 4, 0, usr) == false);
-    QVERIFY(w.tryMatch(0, 2, 2, -4, 0, usr) == false);
-    QVERIFY(w.tryMatch(2, 12, 3, 13, 0, usr) == true);
+    QVERIFY(w.tryMatch(0, 2, 2, -4, 0, usr) == false); // invalid
+    QVERIFY(w.tryMatch(2, 12, 3, 13, 0, usr) == true); // corner
     QVERIFY(w.tryMatch(5, 11, 4, 13, 0, usr) == true);
 }
 

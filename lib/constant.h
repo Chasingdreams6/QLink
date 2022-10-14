@@ -4,7 +4,7 @@
 
 
 #define SCREEN_WIDTH 960 // 屏幕宽度至少960
-#define SCREEN_HEIGHT 880 // 屏幕高度至少880
+#define SCREEN_HEIGHT 880 // 屏幕高度至少880，否则可能打印不完
 #define LINE 13 // 地图行数默认13, 行和列至少得有一个偶数使得有解，不同line/column的档不能互通
 #define COLUMN 16 // 地图列数默认16， test是针对13*16写的，修改需要屏蔽test
 #define SIZE 60 // 每一个方块的像素大小

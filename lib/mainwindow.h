@@ -29,7 +29,7 @@ private:
     void generateBlocks(int level);
     void generateProp(enum Map);
     void generateOutSpace(enum Map);
-    void move(enum Direction, enum Map);
+    void move(enum Direction, User &usr);
     bool dfs(int curx, int cury, int lastx, int lasty, int countTurns, enum LastMove, int opt);
     void drawLine();
     bool differ(int x1, int y1, int x2, int y2);

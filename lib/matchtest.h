@@ -1,3 +1,4 @@
+#pragma once
 #ifndef MATCHTEST_H
 #define MATCHTEST_H
 #include <QtTest/QtTest>

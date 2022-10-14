@@ -1,3 +1,4 @@
+#pragma once
 #ifndef HELPPAGE_H
 #define HELPPAGE_H
 

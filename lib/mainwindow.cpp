@@ -18,20 +18,19 @@
 int moveX[] = {-1, 1, 0, 0}; // 上下左右 对应的数组下标变化
 int moveY[] = {0, 0, -1, 1};
 const int points[] = {100, 90, 80, 70, 60, 50};
-int level = 6;
+int level = 6;  // curmax is 6
 
 int map[LINE][COLUMN];
 int selected[LINE][COLUMN];
 int visited[LINE][COLUMN];
 int cntPath, reachFlag;
 Poi path[LINE * COLUMN];
-int lastx = -1, lasty = -1;
 int lastT = INIT_TIME;
 Poi hint1 = Poi(-1, -1), hint2 = Poi(-1, -1);
 int hintTime = 0;
 bool isActivated = false;
 bool multiPlayerMode = false;
-User user1, user2;
+User user1(USER1), user2(USER2);
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -285,21 +284,21 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape)
         endGame();
     if (event->key() == Qt::Key_Up)
-        move(UP, USER1);
+        move(UP, user1);
     if (event->key() == Qt::Key_Left)
-        move(LEFT, USER1);
+        move(LEFT, user1);
     if (event->key() == Qt::Key_Right)
-        move(RIGHT, USER1);
+        move(RIGHT, user1);
     if (event->key() == Qt::Key_Down)
-        move(DOWN, USER1);
+        move(DOWN, user1);
     if (event->key() == Qt::Key_W && multiPlayerMode)
-        move(UP, USER2);
+        move(UP, user2);
     if (event->key() == Qt::Key_A && multiPlayerMode)
-        move(LEFT, USER2);
+        move(LEFT, user2);
     if (event->key() == Qt::Key_D && multiPlayerMode)
-        move(RIGHT, USER2);
+        move(RIGHT, user2);
     if (event->key() == Qt::Key_S && multiPlayerMode)
-        move(DOWN, USER2);
+        move(DOWN, user2);
     if (event->key() == Qt::Key_P) {
         if (isActivated) {
             this->close();
@@ -364,7 +363,6 @@ bool MainWindow::haveSolution(int opt)
             }
         }
     }
-    int cc = 0;
     for (int i = 0; i < level; ++i) { // 对于每个种类的方块
         int size = pool[i].size();
         for (int j = 0; j < size; ++j) { // 枚举两个方块
@@ -385,18 +383,11 @@ bool MainWindow::haveSolution(int opt)
     //qDebug() << "cntnotok:" << cc << endl;
     return false;
 }
-void MainWindow::move(enum Direction direction, enum Map usr)
+void MainWindow::move(enum Direction direction, User& usr)
 {
     if (!isActivated) return ; // 如果暂停状态，没有反应
     int curx, cury;
-    if (usr == USER1) {
-        curx = user1.x;
-        cury = user1.y;
-    }
-    else {
-        curx = user2.x;
-        cury = user2.y;
-    }
+    curx = usr.x; cury = usr.y;
     int nxtx = curx + moveX[direction]; // 数组的顺序对应实际绘画的顺序, curx, cury是数组下标不是具体坐标
     int nxty = cury + moveY[direction];
     //qDebug() << curx << cury << nxtx << nxty << endl;
@@ -405,35 +396,36 @@ void MainWindow::move(enum Direction direction, enum Map usr)
     if (nxty < 0) nxty = COLUMN - 1;
     if (nxty == COLUMN) nxty = 0;
     if (map[nxtx][nxty] == EMPTY) { // 移动
-        map[nxtx][nxty] = usr;
+        map[nxtx][nxty] = usr.id;
         map[curx][cury] = EMPTY;
     }
     if (isLegalObject(nxtx, nxty)) { // 该方块是一个待消除方块
-        if (lastx == -1) {
+        if (usr.lastx == -1) {
             selected[nxtx][nxty] = 1;
-            lastx = nxtx;
-            lasty = nxty;
+            usr.lastx = nxtx;
+            usr.lasty = nxty;
         }
         else {
-            if (usr == USER1)
-                tryMatch(nxtx, nxty, lastx, lasty, 1, user1);
-            else tryMatch(nxtx, nxty, lastx, lasty, 1, user2);
-            selected[lastx][lasty] = 0;
-            lastx = lasty = -1;
+//            if (usr == USER1)
+//                tryMatch(nxtx, nxty, lastx, lasty, 1, user1);
+//            else tryMatch(nxtx, nxty, lastx, lasty, 1, user2);
+            tryMatch(nxtx, nxty, usr.lastx, usr.lasty, 1, usr);
+            selected[usr.lastx][usr.lasty] = 0;
+            usr.lastx = usr.lasty = -1;
         }
     }
     if (map[nxtx][nxty] == ADD1) { // 触发+1s道具
         lastT += ADD_TIME;
-        map[nxtx][nxty] = usr;
+        map[nxtx][nxty] = usr.id;
         map[curx][cury] = EMPTY;
     }
     if (map[nxtx][nxty] == SHUFFLE) { // 触发重排道具
-        map[nxtx][nxty] = usr;
+        map[nxtx][nxty] = usr.id;
         map[curx][cury] = EMPTY;
         shuffle();
     }
     if (map[nxtx][nxty] == HINT) { // 触发提示道具
-        map[nxtx][nxty] = usr;
+        map[nxtx][nxty] = usr.id;
         map[curx][cury] = EMPTY;
         hintTime += HINT_TIME;
     }
@@ -442,9 +434,13 @@ void MainWindow::move(enum Direction direction, enum Map usr)
 
 void MainWindow::shuffle() // 重排
 {
-    if (lastx != -1) { // 取消选中效果
-        selected[lastx][lasty] = 1 - selected[lastx][lasty];
-        lastx = lasty = -1;
+    if (user1.lastx != -1) { // 取消选中效果
+        selected[user1.lastx][user1.lasty] = 0;
+        user1.lastx = user1.lasty = -1;
+    }
+    if (user2.lastx != -1) { // 取消选中效果
+        selected[user2.lastx][user2.lasty] = 0;
+        user2.lastx = user2.lasty = -1;
     }
     for (int i = 0; i < SHUFFLE_CNT; ++i) { // 重排网格内的方块
         int x1 = rand() % (LINE - 4) + 2, y1 = rand() % (COLUMN - 4) + 2;
@@ -459,9 +455,10 @@ bool MainWindow::differ(int x1, int y1, int x2, int y2)
 // 判断(x1, y1)是不是合法的可消除方块
 bool MainWindow::isLegalObject(int x1, int y1)
 {
+    int ITEMMX = ITEM1 + level - 1;
     if (x1 < 2 || x1 > LINE - 2)return false;
     if (y1 < 2 || y1 > COLUMN - 2) return false;
-    if (map[x1][y1] < ITEM1 || map[x1][y1] > ITEM6) return false;
+    if (map[x1][y1] < ITEM1 || map[x1][y1] > ITEMMX) return false;
     return true;
 }
 // 尝试进行(curx, cury)方块与(lastx, lasty)方块的匹配
@@ -511,7 +508,7 @@ bool MainWindow::dfs(int curx, int cury, int lastx, int lasty, int countTurns, e
         int nxty = cury + moveY[i];
         if (nxtx >= LINE || nxtx < 0 || nxty >= COLUMN || nxty < 0) continue;
         if (visited[nxtx][nxty]) continue;
-        if (map[nxtx][nxty] >= ITEM1 && map[nxtx][nxty] <= ITEM6 && (nxtx != lastx || nxty != lasty)) continue;
+        if (isLegalObject(nxtx, nxty) && (nxtx != lastx || nxty != lasty)) continue;
         if (nxtx != curx) { // movex
             if (lastMove == Y)
                 res |= dfs(nxtx, nxty, lastx, lasty, countTurns + 1, X, opt);
@@ -610,7 +607,7 @@ void MainWindow::writeFile()
         }
         out << endl;
     }
-    out << lastT << " " << hintTime << endl;
+    out << lastT << " " << hintTime << " " << multiPlayerMode << endl;
     out << user1.x << " " << user1.y << " " << user1.pts << endl;
     out << user2.x << " " << user2.y << " " << user2.pts << endl;
     file.close();
@@ -638,6 +635,7 @@ void MainWindow::readFile()
         bool ok = false;
         lastT = list[0].toInt(&ok, 10);
         hintTime = list[1].toInt(&ok, 10);
+        multiPlayerMode = list[2].toInt(&ok, 10);
 
         array = file.readLine();
         str = QString(array);

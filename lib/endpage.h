@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ENDPAGE_H
 #define ENDPAGE_H
 
